@@ -8,7 +8,6 @@ export default async function Home({
   searchParams: Record<string, string>;
 }) {
   // const hello = await api.post.hello({ text: "from tRPC" });
-  console.log("searchParams", searchParams);
 
   void api.post.getLatest.prefetch();
 
