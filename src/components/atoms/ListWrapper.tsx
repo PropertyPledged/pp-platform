@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react'
 
-export type KeyExtractor<T> = (item: T, index: number) => string
+export type KeyExtractor<T> = (item: T, index: number) => string | number
 
 type ListWrapperProps<T> = {
     list: T[]

@@ -8,7 +8,7 @@ function Navbar() {
     return (
         <nav className="h-20 w-full px-6 2xl:px-0">
             <div className="mx-auto flex h-full max-w-screen-2xl items-center justify-between gap-x-4">
-                <Link href="/" passHref className="my-auto h-full w-1/4 py-3">
+                <Link href="/" passHref className="my-auto h-full w-1/4 py-4">
                     <Image
                         src="/pplogo.png"
                         alt="logo"
