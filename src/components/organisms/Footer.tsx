@@ -1,5 +1,4 @@
 import { Linkedin } from 'lucide-react'
-import { title } from 'process'
 import Link from 'next/link'
 import React from 'react'
 import Heading from '../atoms/Heading'
