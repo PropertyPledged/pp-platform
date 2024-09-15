@@ -1,5 +1,8 @@
+'use client'
+
 import { Linkedin } from 'lucide-react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import React from 'react'
 import Heading from '../atoms/Heading'
 import ListWrapper from '../atoms/ListWrapper'
@@ -69,8 +72,12 @@ const legalLinks = [
 ]
 
 function Footer() {
+    const pathname = usePathname()
+    const hidden = ['/suggestion']
+
+    if (hidden.includes(pathname)) return null
     return (
-        <section id="pp.footer" className="min-h-96 bg-[#334C65] py-10">
+        <section id="pp.footer" className="min-h-96 bg-primary/80 py-10">
             <div className="mx-auto grid max-w-screen-2xl grid-cols-1 py-28 md:grid-cols-2">
                 <div className="col-span-1 space-y-5 text-white">
                     <Heading as="h5" className="text-white">

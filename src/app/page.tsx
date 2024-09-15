@@ -330,7 +330,12 @@ export default async function Home() {
                         meets all your needs.
                     </Text>
 
-                    <Button className="w-48">Share your ideas</Button>
+                    <Link
+                        href="/suggestion"
+                        passHref
+                        className="w-48 rounded-md bg-primary p-4 px-6 text-sm text-white hover:bg-primary/80">
+                        Share your ideas
+                    </Link>
                 </div>
                 <div className="flex items-center justify-center">
                     <Image
