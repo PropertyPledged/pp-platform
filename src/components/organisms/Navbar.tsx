@@ -1,12 +1,10 @@
 'use client'
 
-import Image from 'next/image'
-import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import React from 'react'
+import Logo from '@components/atoms/Logo'
 import Navlinks from '@components/molecules/Navlinks'
 import { Button } from '@components/ui/button'
-import Logo from '../atoms/Logo'
 
 function Navbar() {
     const pathname = usePathname()
