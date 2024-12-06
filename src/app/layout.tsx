@@ -1,8 +1,7 @@
-import Footer from '@/components/organisms/Footer'
-import Navbar from '@/components/organisms/Navbar'
 import '@/styles/globals.css'
 import { TRPCReactProvider } from '@/trpc/react'
 import { type Metadata } from 'next'
+import NextTopLoader from 'nextjs-toploader'
 import { Poppins } from 'next/font/google'
 
 const poppins = Poppins({
@@ -24,9 +23,8 @@ export default function RootLayout({
     return (
         <html lang="en" className={poppins.className}>
             <body>
-                <Navbar />
+                <NextTopLoader color="#001F3F" height={4} />
                 <TRPCReactProvider>{children}</TRPCReactProvider>
-                <Footer />
             </body>
         </html>
     )

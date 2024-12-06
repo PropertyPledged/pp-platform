@@ -7,8 +7,7 @@ import React from 'react'
 import Heading from '../atoms/Heading'
 import ListWrapper from '../atoms/ListWrapper'
 import Text from '../atoms/Text'
-import { Button } from '../ui/button'
-import { Input } from '../ui/input'
+import SubscriptionForm from '../molecules/SubscriptionForm'
 
 const quickLinks = [
     {
@@ -78,7 +77,7 @@ function Footer() {
     if (hidden.includes(pathname)) return null
     return (
         <section id="pp.footer" className="min-h-96 bg-primary/80 py-10">
-            <div className="mx-auto grid max-w-screen-2xl grid-cols-1 py-28 md:grid-cols-2">
+            <div className="mx-auto grid max-w-screen-2xl grid-cols-1 px-6 py-28 md:grid-cols-2 xl:px-0">
                 <div className="col-span-1 space-y-5 text-white">
                     <Heading as="h5" className="text-white">
                         Contact Us
@@ -178,24 +177,7 @@ function Footer() {
                             Get the latest updates, tips and exclusive offers
                             delivered to your inbox
                         </Text>
-                        <form className="flex items-end gap-6">
-                            <div className="space-y-1">
-                                <label htmlFor="email" className="text-sm">
-                                    Your email
-                                </label>
-                                <Input
-                                    type="email"
-                                    placeholder="Enter your email"
-                                    className="w-96 border-gray-100 bg-white/10 placeholder:text-gray-300"
-                                />
-                            </div>
-                            <Button
-                                variant="default"
-                                type="submit"
-                                className="bg-white px-4 py-2 text-primary">
-                                Subscribe Now
-                            </Button>
-                        </form>
+                        <SubscriptionForm />
                     </div>
                 </div>
             </div>

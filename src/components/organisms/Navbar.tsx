@@ -11,6 +11,13 @@ function Navbar() {
     const hidden = ['/suggestion']
 
     if (hidden.includes(pathname)) return null
+
+    const handleSubscribe = () => {
+        // get the input id and focus on it
+        if (typeof window !== 'undefined') {
+            document.getElementById('subscribe')?.focus()
+        }
+    }
     return (
         <nav className="h-20 w-full px-6 2xl:px-0">
             <div className="mx-auto flex h-full max-w-screen-2xl items-center justify-between gap-x-4">
@@ -18,10 +25,11 @@ function Navbar() {
                 <div className="flex flex-1 items-center justify-end gap-x-14">
                     <Navlinks />
                     <div className="space-x-4">
-                        <Button variant="outline" className="w-36">
-                            Join Us
+                        <Button className="w-36" onClick={handleSubscribe}>
+                            Subscribe
                         </Button>
-                        <Button className="w-36">Write a review</Button>
+                        {/* <Button variant="outline" className="w-36">Join Us</Button> */}
+                        {/* <Button className="w-36">Write a review</Button> */}
                     </div>
                 </div>
             </div>

@@ -37,7 +37,7 @@ function Navlinks() {
                         <Link
                             href={link.href}
                             passHref
-                            className={cn({
+                            className={cn('text-sm', {
                                 'underline underline-offset-[14px]': active,
                             })}>
                             {link.label}
