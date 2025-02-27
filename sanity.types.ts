@@ -71,20 +71,6 @@ export type Geopoint = {
   alt?: number;
 };
 
-export type Categoryoption = {
-  _type: "categoryoption";
-  title?: string;
-  question?: string;
-  responses?: Array<{
-    name?: string;
-    email?: string;
-    response?: string;
-    createdAt?: string;
-    _type: "response";
-    _key: string;
-  }>;
-};
-
 export type BlockContent = Array<
   | {
       children?: Array<{
@@ -119,14 +105,17 @@ export type BlockContent = Array<
     }
 >;
 
+export type Categoryoption = {
+  _type: "categoryoption";
+  title?: string;
+  question?: string;
+};
+
 export type Response = {
-  _id: string;
   _type: "response";
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
   name?: string;
   email?: string;
+  question?: string;
   response?: string;
   createdAt?: string;
 };
@@ -138,10 +127,16 @@ export type Suggestion = {
   _updatedAt: string;
   _rev: string;
   name?: string;
+  goal?: string;
   options?: Array<
     {
       _key: string;
     } & Categoryoption
+  >;
+  responses?: Array<
+    {
+      _key: string;
+    } & Response
   >;
 };
 
@@ -360,8 +355,8 @@ export type AllSanitySchemaTypes =
   | SanityImageDimensions
   | SanityFileAsset
   | Geopoint
-  | Categoryoption
   | BlockContent
+  | Categoryoption
   | Response
   | Suggestion
   | Post
@@ -663,18 +658,35 @@ export type PostQueryResult = {
   featured?: boolean;
   readTime: number;
 } | null;
-// Variable: suggestions
+// Variable: suggestionsQuery
 // Query: *[_type == 'suggestion']{  ...  }
-export type SuggestionsResult = Array<{
+export type SuggestionsQueryResult = Array<{
   _id: string;
   _type: "suggestion";
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
   name?: string;
+  goal?: string;
   options?: Array<
     {
       _key: string;
     } & Categoryoption
   >;
+  responses?: Array<
+    {
+      _key: string;
+    } & Response
+  >;
 }>;
+
+declare module "@sanity/client" {
+  interface SanityQueries {
+    "{\n    ...\n  }": AuthorResult;
+    '{\n    ...,\n    categories[]->{\n        title,\n        slug\n    },\n    "readTime":round(length(pt::text(body)) / 5 / 180 ),\n    author->{\n    ...\n  },\n  }': PostResult;
+    '{\n      "featuredPosts": *[_type == \'post\' && featured == true] | order(publishedAt desc){\n    ...,\n    categories[]->{\n        title,\n        slug\n    },\n    "readTime":round(length(pt::text(body)) / 5 / 180 ),\n    author->{\n    ...\n  },\n  },\n      "posts": *[_type == \'post\' && featured != true] | order(publishedAt desc){\n    ...,\n    categories[]->{\n        title,\n        slug\n    },\n    "readTime":round(length(pt::text(body)) / 5 / 180 ),\n    author->{\n    ...\n  },\n  }\n}': PostsQueryResult;
+    "*[_type == 'post'] | order(publishedAt desc){\n    ...,\n    categories[]->{\n        title,\n        slug\n    },\n    \"readTime\":round(length(pt::text(body)) / 5 / 180 ),\n    author->{\n    ...\n  },\n  }": AllPostsQueryResult;
+    " *[_type == 'post' && slug.current == $slug][0]{\n    ...,\n    categories[]->{\n        title,\n        slug\n    },\n    \"readTime\":round(length(pt::text(body)) / 5 / 180 ),\n    author->{\n    ...\n  },\n  }": PostQueryResult;
+    "*[_type == 'suggestion']{\n  ...\n  }": SuggestionsQueryResult;
+  }
+}

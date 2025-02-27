@@ -4,6 +4,7 @@ import { createResponse } from "@/actions/createResponse";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -15,20 +16,21 @@ import {
   type SuggestionType,
 } from "@/schemas/suggestionSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ChevronDown, Loader } from "lucide-react";
-import type { SuggestionsResult } from "sanity.types";
+import { ChevronDown, Loader, Trash, X } from "lucide-react";
+import type { SuggestionsQueryResult } from "sanity.types";
 import { useRouter } from "next/navigation";
 import React, { useTransition } from "react";
 import { useForm } from "react-hook-form";
 import Heading from "../atoms/Heading";
 import ListWrapper from "../atoms/ListWrapper";
+import Text from "../atoms/Text";
 import MultiSelectDropdown from "../molecules/MultiselectDropdown";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
 
 type SuggestionFormProps = {
-  suggestions: SuggestionsResult;
+  suggestions: SuggestionsQueryResult;
 };
 
 function SuggestionForm({ suggestions }: SuggestionFormProps) {
@@ -53,16 +55,14 @@ function SuggestionForm({ suggestions }: SuggestionFormProps) {
           email: data.email,
         })
           .then(() => {
-            console.log("Response created");
+            // clear the form
+            router.push("/suggestion/confirmation");
+            form.reset();
           })
           .catch((error) => {
             throw error;
           });
       }
-
-      // clear the form
-      form.reset();
-      router.push("/suggestion/confirmation");
     });
   });
 
@@ -104,7 +104,15 @@ function SuggestionForm({ suggestions }: SuggestionFormProps) {
             </Heading>
 
             <div className="space-y-3">
-              <ListWrapper list={suggestions} keyExtractor={(sugg) => sugg._id}>
+              <ListWrapper
+                list={suggestions}
+                keyExtractor={(sugg) => sugg._id}
+                renderFallback={() => (
+                  <Text variant="muted" className="text-center">
+                    😕 No suggestions currently available!
+                  </Text>
+                )}
+              >
                 {(suggestion) => {
                   const options = suggestion?.options?.map((option) => ({
                     label: option?.title ?? "",
@@ -116,64 +124,109 @@ function SuggestionForm({ suggestions }: SuggestionFormProps) {
                       <FormField
                         control={form.control}
                         name={`responses.${suggestion?._id}`}
-                        render={({ field }) => {
+                        render={({ field: suggestionField }) => {
                           // get the value
                           let currentValue = [] as string[];
 
-                          if (field?.value?.length > 0) {
-                            currentValue = field?.value.map(
+                          if (suggestionField?.value?.length > 0) {
+                            currentValue = suggestionField?.value.map(
                               (item) => item.question,
                             );
                           }
 
                           return (
-                            <FormItem className="w-full space-y-2">
-                              <FormLabel>{suggestion.name ?? ""}</FormLabel>
-                              <FormControl>
-                                <MultiSelectDropdown
-                                  value={currentValue}
-                                  options={options ?? []}
-                                  onValueChange={(value) => {
-                                    const newValue = value.map((opt) => ({
-                                      question: opt,
-                                      response: "",
-                                      createdAt: new Date(),
-                                    }));
-                                    field.onChange(newValue);
-                                  }}
-                                  renderTrigger={() => (
-                                    <Button
-                                      variant="outline"
-                                      className="flex h-10 w-full justify-between font-normal"
-                                    >
-                                      <span className="flex w-3/4 flex-wrap items-center justify-start gap-1">
-                                        <ListWrapper
-                                          list={currentValue}
-                                          renderFallback={() => "Select option"}
-                                          keyExtractor={(opt) => opt}
-                                        >
-                                          {(opt) => (
-                                            <Badge>{opt.split(":")[0]}</Badge>
-                                          )}
-                                        </ListWrapper>
-                                      </span>
-                                      <ChevronDown className="ml-2 h-4 w-4" />
-                                    </Button>
-                                  )}
-                                />
-                              </FormControl>
+                            <FormItem className="w-full space-y-6">
+                              <div className="space-y-2">
+                                <FormLabel className="text-base">
+                                  {suggestion.name ?? ""}
+                                </FormLabel>
+                                <FormDescription className="text-sm">
+                                  {suggestion.goal ?? ""}
+                                </FormDescription>
+                                <FormControl className="pb-10">
+                                  <MultiSelectDropdown
+                                    value={currentValue}
+                                    options={options ?? []}
+                                    onValueChange={(value) => {
+                                      const newValue = value.map((opt) => ({
+                                        question: opt,
+                                        response: "",
+                                        createdAt: new Date(),
+                                      }));
+                                      suggestionField.onChange(newValue);
+                                    }}
+                                    renderTrigger={() => (
+                                      <Button
+                                        variant="outline"
+                                        className="flex h-auto min-h-10 w-full justify-between font-normal transition-all duration-300"
+                                      >
+                                        <span className="flex w-full flex-wrap items-center justify-start gap-1">
+                                          <ListWrapper
+                                            list={currentValue ?? []}
+                                            renderFallback={() =>
+                                              "Select option"
+                                            }
+                                            keyExtractor={(opt) => opt}
+                                          >
+                                            {(opt) => (
+                                              <Badge>
+                                                {opt?.split(":")[0] ?? ""}
+                                              </Badge>
+                                            )}
+                                          </ListWrapper>
+                                          {currentValue.length > 0 &&
+                                            currentValue?.length !==
+                                              options?.length && (
+                                              <span className="text-sm text-gray-400">
+                                                select option
+                                              </span>
+                                            )}
+                                        </span>
+                                        <ChevronDown className="ml-2 h-4 w-4" />
+                                      </Button>
+                                    )}
+                                  />
+                                </FormControl>
+                                {currentValue?.length > 1 && (
+                                  <button
+                                    type="button"
+                                    className="text-sm text-gray-500 underline underline-offset-2 hover:text-gray-700"
+                                    onClick={() => suggestionField.onChange([])}
+                                  >
+                                    Clear options
+                                  </button>
+                                )}
+                              </div>
 
                               <ListWrapper
                                 list={currentValue}
-                                keyExtractor={(opt) => opt.split(":")[0] ?? ""}
+                                keyExtractor={(opt) => opt?.split(":")[0] ?? ""}
                               >
                                 {(option, index) => (
                                   <FormField
                                     control={form.control}
                                     name={`responses.${suggestion?._id}.${index}.response`}
                                     render={({ field }) => (
-                                      <FormItem className="my-4">
-                                        <FormLabel>{option}</FormLabel>
+                                      <FormItem>
+                                        <div className="flex items-center justify-between gap-2">
+                                          <FormLabel className="max-w-md leading-normal">
+                                            {option}
+                                          </FormLabel>
+                                          <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() => {
+                                              suggestionField.onChange(
+                                                suggestionField.value.filter(
+                                                  (_, idx) => idx !== index,
+                                                ),
+                                              );
+                                            }}
+                                          >
+                                            <Trash className="h-4 w-4" />
+                                          </Button>
+                                        </div>
                                         <FormControl>
                                           <Textarea
                                             value={field.value}

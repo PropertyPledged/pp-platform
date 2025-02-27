@@ -2,6 +2,7 @@ import Animate from "@/components/atoms/Animate";
 import Heading from "@/components/atoms/Heading";
 import ListWrapper from "@/components/atoms/ListWrapper";
 import Text from "@/components/atoms/Text";
+import EmptyListFallback from "@/components/molecules/EmptyListFallback";
 import Post from "@/components/molecules/Post";
 import FeaturedPosts from "@/components/organisms/FeaturedPosts";
 import { sanityFetch } from "@/sanity/utils/fetch";
@@ -32,7 +33,20 @@ async function Blogs() {
           </Text>
         </Animate>
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-          <ListWrapper list={data?.posts} keyExtractor={(post) => post._id}>
+          <ListWrapper
+            list={data?.posts}
+            keyExtractor={(post) => post._id}
+            renderFallback={() => (
+              <Animate dir="up" duration={0.6}>
+                <EmptyListFallback
+                  title="No Blog Posts Found"
+                  description="It looks like there aren't any blog posts available at the moment."
+                  primaryAction={{ label: "Back to Blog Home", href: "/" }}
+                  // secondaryAction={{ label: "Subscribe", href: "/subscribe" }}
+                />
+              </Animate>
+            )}
+          >
             {(post) => (
               <Animate key={post._id} dir="up" duration={0.5}>
                 <Post post={post} />

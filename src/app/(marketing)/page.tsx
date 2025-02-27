@@ -101,12 +101,14 @@ export default async function Home() {
                 {(about, index) => (
                   <Animate dir="up" duration={0.3 * index + 1}>
                     <Card className="h-full border-gray-200 p-5 shadow-sm">
-                      <CardHeader className="space-y-2">
+                      <CardHeader className="space-y-3">
                         <span>{about.icon}</span>
                         <CardTitle className="font-medium">
                           {about.title}
                         </CardTitle>
-                        <CardDescription>{about.description}</CardDescription>
+                        <CardDescription className="text-base">
+                          {about.description}
+                        </CardDescription>
                       </CardHeader>
                     </Card>
                   </Animate>

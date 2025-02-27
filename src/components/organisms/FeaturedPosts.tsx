@@ -11,15 +11,17 @@ type FeaturedPostsProps = {
 function FeaturedPosts({ posts }: FeaturedPostsProps) {
   return (
     <div className="mx-auto flex w-full max-w-screen-2xl items-center justify-center overflow-hidden rounded-lg">
-      <Carousel className="w-full lg:h-[55vh] lg:rounded-lg">
-        <CarouselContent className="ml-0 h-full w-full">
-          <ListWrapper list={posts} keyExtractor={(post) => post?._id ?? ""}>
-            {(post, idx) => (
-              <FeaturedPost post={post} idx={idx} postsCount={posts.length} />
-            )}
-          </ListWrapper>
-        </CarouselContent>
-      </Carousel>
+      {posts?.length > 0 ? (
+        <Carousel className="w-full lg:h-[55vh] lg:rounded-lg">
+          <CarouselContent className="ml-0 h-full w-full">
+            <ListWrapper list={posts} keyExtractor={(post) => post?._id ?? ""}>
+              {(post, idx) => (
+                <FeaturedPost post={post} idx={idx} postsCount={posts.length} />
+              )}
+            </ListWrapper>
+          </CarouselContent>
+        </Carousel>
+      ) : null}
     </div>
   );
 }
