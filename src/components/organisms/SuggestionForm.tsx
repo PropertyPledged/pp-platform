@@ -16,7 +16,7 @@ import {
   type SuggestionType,
 } from "@/schemas/suggestionSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ChevronDown, Loader, Trash, X } from "lucide-react";
+import { ChevronDown, Loader, Trash } from "lucide-react";
 import type { SuggestionsQueryResult } from "sanity.types";
 import { useRouter } from "next/navigation";
 import React, { useTransition } from "react";
