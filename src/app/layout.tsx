@@ -1,8 +1,11 @@
+import { DisableDraftMode } from '@/components/sanity/DisableDraftMode'
 import '@/styles/globals.css'
 import { TRPCReactProvider } from '@/trpc/react'
 import { type Metadata } from 'next'
+import { VisualEditing } from 'next-sanity'
 import NextTopLoader from 'nextjs-toploader'
 import { Poppins } from 'next/font/google'
+import { draftMode } from 'next/headers'
 
 const poppins = Poppins({
     subsets: ['latin'],
@@ -17,15 +20,23 @@ export const metadata: Metadata = {
     icons: [{ rel: 'icon', url: '/favicon.ico' }],
 }
 
-export default function RootLayout({
-    children,
-}: Readonly<{ children: React.ReactNode }>) {
+type RootLayoutProps = Readonly<{ children: React.ReactNode }>
+
+async function RootLayout({ children }: RootLayoutProps) {
     return (
         <html lang="en" className={poppins.className}>
             <body>
-                <NextTopLoader color="#001F3F" height={4} />
+                <NextTopLoader color="#001F3F" />
+                {(await draftMode()).isEnabled && (
+                    <>
+                        <VisualEditing />
+                        <DisableDraftMode />
+                    </>
+                )}
                 <TRPCReactProvider>{children}</TRPCReactProvider>
             </body>
         </html>
     )
 }
+
+export default RootLayout

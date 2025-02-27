@@ -25,20 +25,34 @@ const links = [
     },
 ]
 
-function Navlinks() {
+type NavlinksProps = {
+    cb?: VoidFunction
+}
+
+function Navlinks({ cb }: NavlinksProps) {
     const pathname = usePathname()
 
     return (
-        <div className="space-x-12">
+        <div className="relative z-10 flex flex-col items-center gap-16 lg:flex-row lg:gap-10">
             <ListWrapper list={links} keyExtractor={(item) => item.label}>
                 {(link) => {
-                    const active = pathname === link.href
+                    let isActive = false
+                    if (link.href === '/') {
+                        isActive = pathname === link.href
+                    } else {
+                        // remove the initial slash from the pathname
+                        const pathnameWithoutSlash = pathname.slice(1)
+                        isActive = pathnameWithoutSlash?.includes(
+                            link.href.slice(1),
+                        )
+                    }
                     return (
                         <Link
-                            href={link.href}
                             passHref
-                            className={cn('text-sm', {
-                                'underline underline-offset-[14px]': active,
+                            href={link.href}
+                            onClick={() => cb && cb()}
+                            className={cn('text-2xl lg:text-sm', {
+                                'underline underline-offset-[14px]': isActive,
                             })}>
                             {link.label}
                         </Link>

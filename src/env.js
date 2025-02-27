@@ -15,6 +15,9 @@ export const env = createEnv({
             .string({ message: 'RESEND_API key required for emails' })
             .min(1, { message: 'RESEND_API key required for emails' }),
         RESEND_AUDIENCE_ID: z.string().optional(),
+        SANITY_VIEWER_TOKEN: z.string({
+            message: 'SANITY_VIEWR_TOKEN is required for sanity io',
+        }),
     },
 
     /**
@@ -31,10 +34,11 @@ export const env = createEnv({
      * middlewares) or client-side so we need to destruct manually.
      */
     runtimeEnv: {
-        DATABASE_URL: process.env.DATABASE_URL,
         NODE_ENV: process.env.NODE_ENV,
+        DATABASE_URL: process.env.DATABASE_URL,
         RESEND_API_KEY: process.env.RESEND_API_KEY,
         RESEND_AUDIENCE_ID: process.env.RESEND_AUDIENCE_ID,
+        SANITY_VIEWER_TOKEN: process.env.SANITY_VIEWER_TOKEN,
         // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
     },
     /**
