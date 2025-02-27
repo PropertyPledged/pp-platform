@@ -5,12 +5,12 @@ import Text from "@/components/atoms/Text";
 import SuggestionForm from "@/components/organisms/SuggestionForm";
 import { sanityFetch } from "@/sanity/utils/fetch";
 import { suggestionsQuery } from "@/sanity/utils/queries";
-import type { SuggestionsResult } from "sanity.types";
+import type { SuggestionsQueryResult } from "sanity.types";
 import Image from "next/image";
 import React from "react";
 
 async function SuggestionPage() {
-  const suggestions = await sanityFetch<SuggestionsResult>({
+  const suggestions = await sanityFetch<SuggestionsQueryResult>({
     query: suggestionsQuery,
   });
 
