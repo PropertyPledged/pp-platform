@@ -1,0 +1,272 @@
+"use client";
+
+import { createResponse } from "@/actions/createResponse";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import {
+  suggestionSchema,
+  type SuggestionType,
+} from "@/schemas/suggestionSchema";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ChevronDown, Loader, Trash } from "lucide-react";
+import type { SuggestionsQueryResult } from "sanity.types";
+import { useRouter } from "next/navigation";
+import React, { useTransition } from "react";
+import { useForm } from "react-hook-form";
+import Heading from "../atoms/Heading";
+import ListWrapper from "../atoms/ListWrapper";
+import Text from "../atoms/Text";
+import MultiSelectDropdown from "../molecules/MultiselectDropdown";
+import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
+import { Textarea } from "../ui/textarea";
+
+type SuggestionFormProps = {
+  suggestions: SuggestionsQueryResult;
+};
+
+function SuggestionForm({ suggestions }: SuggestionFormProps) {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+  const form = useForm<SuggestionType>({
+    resolver: zodResolver(suggestionSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      responses: {},
+    },
+  });
+
+  const onSubmit = form.handleSubmit(async (data) => {
+    startTransition(() => {
+      for (const [id, value] of Object.entries(data.responses)) {
+        createResponse({
+          id,
+          value,
+          name: data.name,
+          email: data.email,
+        })
+          .then(() => {
+            // clear the form
+            router.push("/suggestion/confirmation");
+            form.reset();
+          })
+          .catch((error) => {
+            throw error;
+          });
+      }
+    });
+  });
+
+  return (
+    <div className="mx-auto w-full max-w-lg">
+      <Form {...form}>
+        <form onSubmit={onSubmit} className="space-y-8">
+          <div className="space-y-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Name *</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="Jane Doe" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email *</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="janedoe@gmail.com" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          <div className="space-y-6">
+            <Heading as="h5" className="text-lg">
+              Select a category to share your thoughts and help us improve
+            </Heading>
+
+            <div className="space-y-3">
+              <ListWrapper
+                list={suggestions}
+                keyExtractor={(sugg) => sugg._id}
+                renderFallback={() => (
+                  <Text variant="muted" className="text-center">
+                    😕 No suggestions currently available!
+                  </Text>
+                )}
+              >
+                {(suggestion) => {
+                  const options = suggestion?.options?.map((option) => ({
+                    label: option?.title ?? "",
+                    value: `${option.title ?? ""}: ${option.question ?? ""}`,
+                  }));
+
+                  return (
+                    <div className="flex flex-col items-start gap-2">
+                      <FormField
+                        control={form.control}
+                        name={`responses.${suggestion?._id}`}
+                        render={({ field: suggestionField }) => {
+                          // get the value
+                          let currentValue = [] as string[];
+
+                          if (suggestionField?.value?.length > 0) {
+                            currentValue = suggestionField?.value.map(
+                              (item) => item.question,
+                            );
+                          }
+
+                          return (
+                            <FormItem className="w-full space-y-6">
+                              <div className="space-y-2">
+                                <FormLabel className="text-base">
+                                  {suggestion.name ?? ""}
+                                </FormLabel>
+                                <FormDescription className="text-sm">
+                                  {suggestion.goal ?? ""}
+                                </FormDescription>
+                                <FormControl className="pb-10">
+                                  <MultiSelectDropdown
+                                    value={currentValue}
+                                    options={options ?? []}
+                                    onValueChange={(value) => {
+                                      const newValue = value.map((opt) => ({
+                                        question: opt,
+                                        response: "",
+                                        createdAt: new Date(),
+                                      }));
+                                      suggestionField.onChange(newValue);
+                                    }}
+                                    renderTrigger={() => (
+                                      <Button
+                                        variant="outline"
+                                        className="flex h-auto min-h-10 w-full justify-between font-normal transition-all duration-300"
+                                      >
+                                        <span className="flex w-full flex-wrap items-center justify-start gap-1">
+                                          <ListWrapper
+                                            list={currentValue ?? []}
+                                            renderFallback={() =>
+                                              "Select option"
+                                            }
+                                            keyExtractor={(opt) => opt}
+                                          >
+                                            {(opt) => (
+                                              <Badge>
+                                                {opt?.split(":")[0] ?? ""}
+                                              </Badge>
+                                            )}
+                                          </ListWrapper>
+                                          {currentValue.length > 0 &&
+                                            currentValue?.length !==
+                                              options?.length && (
+                                              <span className="text-sm text-gray-400">
+                                                select option
+                                              </span>
+                                            )}
+                                        </span>
+                                        <ChevronDown className="ml-2 h-4 w-4" />
+                                      </Button>
+                                    )}
+                                  />
+                                </FormControl>
+                                {currentValue?.length > 1 && (
+                                  <button
+                                    type="button"
+                                    className="text-sm text-gray-500 underline underline-offset-2 hover:text-gray-700"
+                                    onClick={() => suggestionField.onChange([])}
+                                  >
+                                    Clear options
+                                  </button>
+                                )}
+                              </div>
+
+                              <ListWrapper
+                                list={currentValue}
+                                keyExtractor={(opt) => opt?.split(":")[0] ?? ""}
+                              >
+                                {(option, index) => (
+                                  <FormField
+                                    control={form.control}
+                                    name={`responses.${suggestion?._id}.${index}.response`}
+                                    render={({ field }) => (
+                                      <FormItem>
+                                        <div className="flex items-center justify-between gap-2">
+                                          <FormLabel className="max-w-md leading-normal">
+                                            {option}
+                                          </FormLabel>
+                                          <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() => {
+                                              suggestionField.onChange(
+                                                suggestionField.value.filter(
+                                                  (_, idx) => idx !== index,
+                                                ),
+                                              );
+                                            }}
+                                          >
+                                            <Trash className="h-4 w-4" />
+                                          </Button>
+                                        </div>
+                                        <FormControl>
+                                          <Textarea
+                                            value={field.value}
+                                            className="w-full"
+                                            onChange={(e) =>
+                                              field.onChange(e.target.value)
+                                            }
+                                            onBlur={field.onBlur}
+                                            placeholder="Enter your response"
+                                          />
+                                        </FormControl>
+                                        <FormMessage />
+                                      </FormItem>
+                                    )}
+                                  />
+                                )}
+                              </ListWrapper>
+                            </FormItem>
+                          );
+                        }}
+                      />
+                    </div>
+                  );
+                }}
+              </ListWrapper>
+            </div>
+          </div>
+
+          <Button
+            type="submit"
+            disabled={isPending || !form.formState.isValid}
+            className="w-full gap-3 transition-all"
+          >
+            {isPending && <Loader className="size-5 animate-spin" />}
+            Submit feedback
+          </Button>
+        </form>
+      </Form>
+    </div>
+  );
+}
+
+export default SuggestionForm;
