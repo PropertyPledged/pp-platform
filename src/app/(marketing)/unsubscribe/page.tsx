@@ -27,7 +27,6 @@ import { useState } from "react";
 export default function UnsubscribePage() {
   const searchParams = useSearchParams();
   const email = searchParams.get("email") ?? "";
-  const token = searchParams.get("token") ?? "";
 
   const [status, setStatus] = useState<
     "idle" | "loading" | "success" | "error"
