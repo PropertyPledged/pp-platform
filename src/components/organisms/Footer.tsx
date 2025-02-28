@@ -25,9 +25,13 @@ const quickLinks = [
     href: "/blog",
   },
   {
-    title: "Write Review",
-    href: "#",
+    title: "Your feedback",
+    href: "/suggestion",
   },
+  // {
+  //   title: "Write Review",
+  //   href: "#",
+  // },
 ];
 
 const socialLinks = [
