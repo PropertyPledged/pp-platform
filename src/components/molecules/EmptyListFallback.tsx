@@ -51,7 +51,7 @@ export const EmptyListFallback = ({
           <CardTitle className="font-sans text-2xl font-bold">
             {title}
           </CardTitle>
-          <CardDescription className="font-sans">{description}</CardDescription>
+          <CardDescription>{description}</CardDescription>
         </CardHeader>
         <CardContent className="mt-0 pt-0">
           <p className="mb-4 text-sm text-gray-500">{message}</p>

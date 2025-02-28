@@ -72,8 +72,8 @@ function Share({ title, className }: ShareProps) {
         <Button
           title={`Copy ${title}`}
           data-active={copied}
-          onClick={() => {
-            onCopy(decodeURIComponent(newUrl));
+          onClick={async () => {
+            await onCopy(decodeURIComponent(newUrl));
           }}
           size="icon"
           variant="outline"
