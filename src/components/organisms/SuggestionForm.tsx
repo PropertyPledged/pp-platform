@@ -68,6 +68,9 @@ function SuggestionForm({ suggestions }: SuggestionFormProps) {
 
   return (
     <div className="mx-auto w-full max-w-lg">
+      {/* <div className="absolute -left-72 h-auto min-h-[300px] w-[400px] overflow-hidden bg-blue-50 p-3">
+        <pre>{JSON.stringify(form.watch(), null, 2)}</pre>
+      </div> */}
       <Form {...form}>
         <form onSubmit={onSubmit} className="space-y-8">
           <div className="space-y-4">
@@ -116,7 +119,7 @@ function SuggestionForm({ suggestions }: SuggestionFormProps) {
                 {(suggestion) => {
                   const options = suggestion?.options?.map((option) => ({
                     label: option?.title ?? "",
-                    value: `${option.title ?? ""}: ${option.question ?? ""}`,
+                    value: `${option.title ?? ""}:${option.question ?? ""}`,
                   }));
 
                   return (
@@ -126,6 +129,9 @@ function SuggestionForm({ suggestions }: SuggestionFormProps) {
                         name={`responses.${suggestion?._id}`}
                         render={({ field: suggestionField }) => {
                           // get the value
+                          const response = form.watch(
+                            `responses.${suggestion?._id}`,
+                          );
                           let currentValue = [] as string[];
 
                           if (suggestionField?.value?.length > 0) {
@@ -148,11 +154,20 @@ function SuggestionForm({ suggestions }: SuggestionFormProps) {
                                     value={currentValue}
                                     options={options ?? []}
                                     onValueChange={(value) => {
-                                      const newValue = value.map((opt) => ({
-                                        question: opt,
-                                        response: "",
-                                        createdAt: new Date(),
-                                      }));
+                                      const newValue = value.map((opt) => {
+                                        // update existing responses with their values
+                                        const existingRes = response?.find(
+                                          (item) => item.question === opt,
+                                        );
+                                        return {
+                                          question: opt,
+                                          response: existingRes?.response ?? "",
+                                          createdAt:
+                                            existingRes?.createdAt ??
+                                            new Date(),
+                                        };
+                                      });
+
                                       suggestionField.onChange(newValue);
                                     }}
                                     renderTrigger={() => (
@@ -191,7 +206,11 @@ function SuggestionForm({ suggestions }: SuggestionFormProps) {
                                   <button
                                     type="button"
                                     className="text-sm text-gray-500 underline underline-offset-2 hover:text-gray-700"
-                                    onClick={() => suggestionField.onChange([])}
+                                    onClick={() => {
+                                      form.resetField(
+                                        `responses.${suggestion?._id}`,
+                                      );
+                                    }}
                                   >
                                     Clear options
                                   </button>
@@ -206,41 +225,59 @@ function SuggestionForm({ suggestions }: SuggestionFormProps) {
                                   <FormField
                                     control={form.control}
                                     name={`responses.${suggestion?._id}.${index}.response`}
-                                    render={({ field }) => (
-                                      <FormItem>
-                                        <div className="flex items-center justify-between gap-2">
-                                          <FormLabel className="max-w-md leading-normal">
-                                            {option}
-                                          </FormLabel>
-                                          <Button
-                                            type="button"
-                                            variant="ghost"
-                                            size="icon"
-                                            onClick={() => {
-                                              suggestionField.onChange(
-                                                suggestionField.value.filter(
-                                                  (_, idx) => idx !== index,
-                                                ),
-                                              );
-                                            }}
-                                          >
-                                            <Trash className="h-4 w-4" />
-                                          </Button>
-                                        </div>
-                                        <FormControl>
-                                          <Textarea
-                                            value={field.value}
-                                            className="w-full"
-                                            onChange={(e) =>
-                                              field.onChange(e.target.value)
-                                            }
-                                            onBlur={field.onBlur}
-                                            placeholder="Enter your response"
-                                          />
-                                        </FormControl>
-                                        <FormMessage />
-                                      </FormItem>
-                                    )}
+                                    render={({ field }) => {
+                                      const [opt, question] =
+                                        option?.split(":");
+
+                                      return (
+                                        <FormItem>
+                                          <div className="flex items-center justify-between gap-2">
+                                            <div>
+                                              <FormLabel className="max-w-md leading-normal">
+                                                {opt}
+                                              </FormLabel>
+                                              <FormDescription className="text-sm">
+                                                {question}
+                                              </FormDescription>
+                                            </div>
+                                            <Button
+                                              type="button"
+                                              variant="ghost"
+                                              size="icon"
+                                              onClick={() => {
+                                                suggestionField.onChange(
+                                                  suggestionField.value.filter(
+                                                    (_, idx) => idx !== index,
+                                                  ),
+                                                );
+                                                if (
+                                                  suggestionField.value
+                                                    .length === 1
+                                                ) {
+                                                  form.resetField(
+                                                    `responses.${suggestion?._id}`,
+                                                  );
+                                                }
+                                              }}
+                                            >
+                                              <Trash className="h-4 w-4" />
+                                            </Button>
+                                          </div>
+                                          <FormControl>
+                                            <Textarea
+                                              value={field.value}
+                                              className="min-h-40 w-full"
+                                              onChange={(e) =>
+                                                field.onChange(e.target.value)
+                                              }
+                                              onBlur={field.onBlur}
+                                              placeholder="Enter your response"
+                                            />
+                                          </FormControl>
+                                          <FormMessage />
+                                        </FormItem>
+                                      );
+                                    }}
                                   />
                                 )}
                               </ListWrapper>

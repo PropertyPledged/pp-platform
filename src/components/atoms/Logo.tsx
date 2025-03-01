@@ -4,7 +4,7 @@ import React from "react";
 
 function Logo() {
   return (
-    <Link href="/" passHref className="my-auto h-full w-20 cursor-pointer py-4">
+    <Link href="/" passHref className="my-auto h-full w-16 cursor-pointer py-3">
       <Image
         src="/pplogo.png"
         alt="logo"
