@@ -109,13 +109,6 @@ export function WelcomeEmail({
             alt="Property Pledged Logo"
             className="mx-auto my-20"
           />
-          <Img
-            width="600"
-            height="600"
-            src={`${baseUrl}/wavy.png`}
-            alt="Property Pledged Logo"
-            className="absolute -top-24 right-0 -z-10 mx-auto my-20"
-          />
 
           <Container className="bg-white">
             <Heading className="my-0 py-10 text-center text-2xl font-semibold leading-8">
@@ -124,8 +117,8 @@ export function WelcomeEmail({
 
             <Img
               src={`${baseUrl}/working-together.png`}
-              width="250"
-              height="250"
+              width="200"
+              height="200"
               alt="Property pledged working together"
               className="mx-auto"
             />
@@ -133,7 +126,7 @@ export function WelcomeEmail({
             <Section>
               <Row>
                 <Heading className="px-2 text-lg font-bold">
-                  Hi {user.name}
+                  Welcome {user.name ?? ""}
                 </Heading>
                 <Text className="px-2 text-gray-600">
                   Thank you for subscribing to Property Pledge! We&apos;re

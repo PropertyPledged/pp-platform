@@ -9,7 +9,14 @@ import Logo from "@components/atoms/Logo";
 import Navlinks from "@components/molecules/Navlinks";
 import { Button } from "@components/ui/button";
 import Animate from "../atoms/Animate";
-import { Sheet, SheetContent, SheetHeader, SheetTrigger } from "../ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "../ui/sheet";
 
 function Navbar() {
   const pathname = usePathname();
@@ -33,11 +40,11 @@ function Navbar() {
       dir="down"
       useObserver={false}
       initiallyVisible={true}
-      className="sticky left-0 top-0 z-20 h-20 w-full bg-gray-50 px-6 shadow-sm 2xl:px-0"
+      className="sticky left-0 top-0 z-20 h-14 w-full bg-gray-50 px-6 shadow-sm md:h-16 2xl:px-0"
     >
       <div className="mx-auto flex h-full w-full max-w-screen-2xl items-center justify-between gap-x-4">
         <Logo />
-        <div className="hidden flex-1 items-center justify-end gap-x-14 lg:flex">
+        <div className="hidden flex-1 items-center justify-end gap-x-8 lg:flex">
           <Navlinks />
           <div className="space-x-4">
             <Button className="w-36" onClick={handleSubscribe}>
@@ -59,11 +66,12 @@ function MobileNav() {
   const handleSubscribe = () => {
     // get the input id and focus on it
     if (typeof window !== "undefined") {
-      document.getElementById("subscribe")?.focus();
-      document
-        .getElementById("subscribe")
-        ?.scrollTo({ behavior: "smooth", top: 20 });
-      onClose();
+      const subscribe = document.getElementById("subscribe");
+      if (subscribe) {
+        subscribe.scrollTo({ behavior: "smooth", top: 20 });
+        // get the input and focus on it
+        subscribe.querySelector("input")?.focus();
+      }
     }
   };
 
@@ -75,16 +83,24 @@ function MobileNav() {
         if (!open) onClose();
       }}
     >
-      <SheetTrigger className="lg:hidden">
-        <Hamburger toggled={isOpen} onToggle={onOpen} direction="right" />
+      <SheetTrigger className="p-0 lg:hidden">
+        <Hamburger
+          toggled={isOpen}
+          onToggle={onOpen}
+          direction="right"
+          size={25}
+        />
       </SheetTrigger>
       <SheetContent className="h-screen w-screen space-y-9" side="left">
-        <SheetHeader className="max-w-screen h-20">
+        <SheetHeader className="max-w-screen h-16">
           <Logo />
+          <SheetTitle></SheetTitle>
+          <SheetDescription></SheetDescription>
         </SheetHeader>
-        <div className="space-y-10 py-20">
+
+        <div className="space-y-10 py-8">
           <Navlinks cb={onClose} />
-          <div className="flex justify-center space-x-4">
+          <div className="flex space-x-4">
             <Button className="w-48" onClick={handleSubscribe}>
               Subscribe
             </Button>
