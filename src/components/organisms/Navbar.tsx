@@ -44,7 +44,7 @@ function Navbar() {
     >
       <div className="mx-auto flex h-full w-full max-w-screen-2xl items-center justify-between gap-x-4">
         <Logo />
-        <div className="hidden flex-1 items-center justify-end gap-x-14 lg:flex">
+        <div className="hidden flex-1 items-center justify-end gap-x-8 lg:flex">
           <Navlinks />
           <div className="space-x-4">
             <Button className="w-36" onClick={handleSubscribe}>

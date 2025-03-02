@@ -79,6 +79,9 @@ function SubscriptionForm({
                 <Input
                   {...field}
                   placeholder="Enter your email"
+                  disabled={subscribe.isPending}
+                  type="email"
+                  required
                   className={cn(
                     "h-12 w-full border-gray-100 bg-white/10 placeholder:text-gray-300 md:w-96",
                     {
@@ -96,11 +99,7 @@ function SubscriptionForm({
         <Button
           type="submit"
           variant="default"
-          disabled={
-            subscribe.isPending ||
-            !form.formState.isDirty ||
-            !form.formState.isValid
-          }
+          disabled={subscribe.isPending}
           className={cn(
             "w-auto min-w-36 space-x-2 bg-white px-4 py-2 text-primary",
             {

@@ -33,7 +33,7 @@ function Navlinks({ cb }: NavlinksProps) {
   const pathname = usePathname();
 
   return (
-    <div className="relative z-10 flex flex-col items-start gap-8 lg:flex-row lg:items-center lg:gap-1">
+    <div className="relative z-10 flex flex-col items-start gap-8 lg:flex-row lg:items-center lg:gap-6">
       <ListWrapper list={links} keyExtractor={(item) => item.label}>
         {(link) => {
           let isActive = false;
