@@ -20,7 +20,7 @@ export const subscriptionRouter = createTRPCRouter({
             subject: `Welcome to Property Pledged!`,
             text: `Thank you for subscribing to Property Pledged!`,
             react: WelcomeEmail({
-              user: { name: "John Doe", email: input.email },
+              user: { name: "", email: input.email },
             }),
           });
 

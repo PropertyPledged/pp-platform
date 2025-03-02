@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import {
   subscriptionSchema,
   type SubscriptionType,
-} from "@/schemas/suggestionSchema";
+} from "@/schemas/subscription";
 import { api } from "@/trpc/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CircleCheckBig, Loader } from "lucide-react";

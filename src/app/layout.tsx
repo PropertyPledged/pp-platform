@@ -1,4 +1,5 @@
 import { DisableDraftMode } from "@/components/sanity/DisableDraftMode";
+import { Toaster } from "@/components/ui/sonner";
 import "@/styles/globals.css";
 import { TRPCReactProvider } from "@/trpc/react";
 import { type Metadata } from "next";
@@ -34,6 +35,7 @@ async function RootLayout({ children }: RootLayoutProps) {
           </>
         )}
         <TRPCReactProvider>{children}</TRPCReactProvider>
+        <Toaster />
       </body>
     </html>
   );

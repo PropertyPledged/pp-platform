@@ -43,7 +43,7 @@ async function SuggestionConfirmation() {
         >
           <Button asChild>
             <Link href="/suggestion" passHref>
-              Submit suggestion
+              &larr; Make new suggestion
             </Link>
           </Button>
           <Button asChild variant="outline">

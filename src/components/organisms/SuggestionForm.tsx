@@ -1,6 +1,5 @@
 "use client";
 
-import { createResponse } from "@/actions/createResponse";
 import {
   Form,
   FormControl,
@@ -15,11 +14,13 @@ import {
   suggestionSchema,
   type SuggestionType,
 } from "@/schemas/suggestionSchema";
+import { api } from "@/trpc/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ChevronDown, Loader, Trash } from "lucide-react";
 import type { SuggestionsQueryResult } from "sanity.types";
+import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import React, { useTransition } from "react";
+import React from "react";
 import { useForm } from "react-hook-form";
 import Heading from "../atoms/Heading";
 import ListWrapper from "../atoms/ListWrapper";
@@ -35,7 +36,6 @@ type SuggestionFormProps = {
 
 function SuggestionForm({ suggestions }: SuggestionFormProps) {
   const router = useRouter();
-  const [isPending, startTransition] = useTransition();
   const form = useForm<SuggestionType>({
     resolver: zodResolver(suggestionSchema),
     defaultValues: {
@@ -45,25 +45,19 @@ function SuggestionForm({ suggestions }: SuggestionFormProps) {
     },
   });
 
-  const onSubmit = form.handleSubmit(async (data) => {
-    startTransition(() => {
-      for (const [id, value] of Object.entries(data.responses)) {
-        createResponse({
-          id,
-          value,
-          name: data.name,
-          email: data.email,
-        })
-          .then(() => {
-            // clear the form
-            router.push("/suggestion/confirmation");
-            form.reset();
-          })
-          .catch((error) => {
-            throw error;
-          });
+  const { mutate, isPending } = api.suggestion.respond.useMutation({
+    onSettled: (_, error) => {
+      if (error) {
+        return toast.error(error.message);
       }
-    });
+
+      router.push("/suggestion/confirmation");
+      form.reset();
+    },
+  });
+
+  const onSubmit = form.handleSubmit(async (data) => {
+    mutate(data);
   });
 
   return (
