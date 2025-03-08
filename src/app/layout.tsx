@@ -7,6 +7,8 @@ import { VisualEditing } from "next-sanity";
 import NextTopLoader from "nextjs-toploader";
 import { Poppins } from "next/font/google";
 import { draftMode } from "next/headers";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -36,6 +38,8 @@ async function RootLayout({ children }: RootLayoutProps) {
         )}
         <TRPCReactProvider>{children}</TRPCReactProvider>
         <Toaster />
+        <SpeedInsights />
+        <Analytics />
       </body>
     </html>
   );

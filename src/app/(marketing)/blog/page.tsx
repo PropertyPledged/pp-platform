@@ -25,7 +25,7 @@ async function Blogs() {
         id="all-posts"
         className="mx-auto mt-12 max-w-screen-2xl space-y-8"
       >
-        <Animate dir="up" duration={0.5} className="space-y-1">
+        <Animate dir="up" duration={0.5} className="space-y-1 px-6 lg:px-0">
           <Heading as="h2">Recent blogs </Heading>
           <Text variant="muted" className="max-w-md">
             Explore and learn more about the property world with our latest and

@@ -64,7 +64,7 @@ function CommunityPage() {
           className="flex flex-col items-center justify-center gap-4"
         >
           <Badge variant="pp">Here&apos;s what you can do</Badge>
-          <Heading>Why join our community?</Heading>
+          <Heading className="text-center">Why join our community?</Heading>
           <Text className="max-w-xl text-center">
             Whether you&apos;re seeking guidance on property management, looking
             to share your experience with others, our community is build to
