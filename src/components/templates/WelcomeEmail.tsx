@@ -29,8 +29,10 @@ interface WelcomeEmailProps extends WelcomeEmailPropsBase {
   };
 }
 
-const baseUrl = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
+const isProduction = process.env.NODE_ENV === "production";
+
+const baseUrl = isProduction
+  ? "https://propertypledged.com"
   : "http://localhost:3000";
 
 const PropDefaults: WelcomeEmailPropsBase = {
