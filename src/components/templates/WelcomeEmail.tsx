@@ -106,21 +106,21 @@ export function WelcomeEmail({
         <Body className="relative bg-white font-sans text-base">
           <Img
             src={`${baseUrl}/pplogo.png`}
-            width="45"
-            height="45"
+            width="35"
+            height="40"
             alt="Property Pledged Logo"
             className="mx-auto my-20"
           />
 
           <Container className="bg-white">
-            <Heading className="my-0 py-10 text-center text-2xl font-semibold leading-8">
+            <Heading className="my-0 py-4 text-center text-2xl font-semibold leading-8">
               You&apos;re all set!
             </Heading>
 
             <Img
               src={`${baseUrl}/working-together.png`}
-              width="200"
-              height="200"
+              width="250"
+              height="250"
               alt="Property pledged working together"
               className="mx-auto"
             />
