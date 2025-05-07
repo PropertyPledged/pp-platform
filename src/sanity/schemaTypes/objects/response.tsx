@@ -5,7 +5,7 @@ export const response = defineType({
   name: "response",
   title: "Suggestion Response",
   type: "object",
-  icon: CommentIcon,
+  icon: () => <CommentIcon />,
   fields: [
     defineField({
       name: "name",
