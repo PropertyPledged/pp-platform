@@ -1,7 +1,7 @@
 import { sanityFetch } from "@/sanity/utils/fetch";
 import { allPostsQuery } from "@/sanity/utils/queries";
-import { MetadataRoute } from "next";
-import { PostsQueryResult, AllPostsQueryResult } from "sanity.types";
+import type { MetadataRoute } from "next";
+import type { AllPostsQueryResult } from "sanity.types";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const BASE_URL = "https://propertypledged.co.uk";
