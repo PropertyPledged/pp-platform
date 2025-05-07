@@ -5,7 +5,7 @@ export const categoryOption = defineType({
   name: "categoryoption",
   title: "Category Option",
   type: "object",
-  icon: BulbOutlineIcon,
+  icon: () => <BulbOutlineIcon />,
   fields: [
     defineField({
       name: "title",

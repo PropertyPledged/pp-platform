@@ -75,6 +75,7 @@ function SubscriptionForm({
               >
                 Your email
               </FormLabel>
+              <br />
               <FormControl>
                 <Input
                   {...field}
@@ -101,7 +102,7 @@ function SubscriptionForm({
           variant="default"
           disabled={subscribe.isPending}
           className={cn(
-            "w-auto min-w-36 space-x-2 bg-white px-4 py-2 text-primary",
+            "text-primary h-12 w-auto min-w-36 space-x-2 bg-white px-4 py-2",
             {
               "bg-primary text-white": bgMode === "light",
             },

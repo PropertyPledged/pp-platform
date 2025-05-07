@@ -12,7 +12,7 @@ function useElementWidth<T extends HTMLElement>(): {
   ref: RefObject<T>;
   width: number | undefined;
 } {
-  const ref = useRef<T>(null);
+  const ref = useRef<T>(null) as RefObject<T>;
   const [width, setWidth] = useState<number | undefined>(undefined);
 
   useEffect(() => {

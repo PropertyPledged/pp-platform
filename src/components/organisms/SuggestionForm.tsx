@@ -163,6 +163,18 @@ function SuggestionForm({ suggestions }: SuggestionFormProps) {
                                       });
 
                                       suggestionField.onChange(newValue);
+
+                                      // scroll to the closest available textarea
+                                      const textarea = document.getElementById(
+                                        `res_${value[value.length - 2]}`,
+                                      );
+
+                                      if (textarea) {
+                                        textarea.scrollIntoView({
+                                          behavior: "smooth",
+                                          block: "start",
+                                        });
+                                      }
                                     }}
                                     renderTrigger={() => (
                                       <Button
@@ -259,6 +271,7 @@ function SuggestionForm({ suggestions }: SuggestionFormProps) {
                                           </div>
                                           <FormControl>
                                             <Textarea
+                                              id={`res_${option}`}
                                               value={field.value}
                                               className="min-h-40 w-full"
                                               onChange={(e) =>

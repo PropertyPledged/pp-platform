@@ -5,7 +5,7 @@ export const suggestion = defineType({
   name: "suggestion",
   title: "Suggestion",
   type: "document",
-  icon: BulbOutlineIcon,
+  icon: () => <BulbOutlineIcon />,
   fields: [
     defineField({
       name: "name",

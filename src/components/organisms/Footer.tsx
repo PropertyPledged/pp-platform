@@ -27,6 +27,10 @@ const quickLinks = [
     title: "Your feedback",
     href: "/suggestion",
   },
+  {
+    title: "Sitemap",
+    href: "/sitemap",
+  },
   // {
   //   title: "Write Review",
   //   href: "#",
@@ -73,7 +77,7 @@ const legalLinks = [
 
 function Footer() {
   return (
-    <section id="pp.footer" className="min-h-96 bg-primary/80 py-10 pt-28">
+    <section id="pp.footer" className="bg-primary/80 min-h-96 py-10 pt-28">
       <div className="mx-auto grid max-w-screen-2xl grid-cols-1 gap-10 px-6 py-28 pt-0 md:grid-cols-2 md:gap-2 2xl:px-0">
         <div className="col-span-1 space-y-5 text-white">
           <Heading as="h3" className="text-white">

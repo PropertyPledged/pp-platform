@@ -2,6 +2,7 @@ import { DisableDraftMode } from "@/components/sanity/DisableDraftMode";
 import { Toaster } from "@/components/ui/sonner";
 import "@/styles/globals.css";
 import { TRPCReactProvider } from "@/trpc/react";
+import { ClerkProvider } from "@clerk/nextjs";
 import { type Metadata } from "next";
 import { VisualEditing } from "next-sanity";
 import NextTopLoader from "nextjs-toploader";
@@ -29,17 +30,19 @@ async function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en" className={poppins.className}>
       <body className={poppins.className}>
-        <NextTopLoader color="#001F3F" />
-        {(await draftMode()).isEnabled && (
-          <>
-            <VisualEditing />
-            <DisableDraftMode />
-          </>
-        )}
-        <TRPCReactProvider>{children}</TRPCReactProvider>
-        <Toaster />
-        <SpeedInsights />
-        <Analytics />
+        <ClerkProvider>
+          <NextTopLoader color="#001F3F" />
+          {(await draftMode()).isEnabled && (
+            <>
+              <VisualEditing />
+              <DisableDraftMode />
+            </>
+          )}
+          <TRPCReactProvider>{children}</TRPCReactProvider>
+          <Toaster />
+          <SpeedInsights />
+          <Analytics />
+        </ClerkProvider>
       </body>
     </html>
   );
