@@ -17,6 +17,7 @@ function AuthLayout({ children }: AuthLayoutProps) {
           alt="wavy auth"
           className="h-full w-full scale-105"
         />
+        
       </div>
     </div>
   );

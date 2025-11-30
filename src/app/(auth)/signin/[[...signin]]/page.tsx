@@ -1,12 +1,8 @@
-// import { SignIn } from "@clerk/nextjs";
+import CustomSignInForm from "@/components/auth/CustomSignInForm";
 import React from "react";
 
 function SigninPage() {
-  return (
-    <div className="mx-auto flex max-w-2xl flex-col items-center justify-center gap-10 py-28">
-      {/* <SignIn signUpUrl="/signup" /> */}
-    </div>
-  );
+  return <CustomSignInForm />;
 }
 
 export default SigninPage;
