@@ -29,7 +29,7 @@ const quickLinks = [
   },
   {
     title: "Sitemap",
-    href: "/sitemap",
+    href: "/sitemap.xml",
   },
   // {
   //   title: "Write Review",
