@@ -1,17 +1,17 @@
 "use client";
 
 import { useDisclosure } from "@/hooks/useDisclosure";
-import { SignedIn, SignedOut, UserButton, useUser } from "@clerk/nextjs";
+import { SignedOut } from "@clerk/nextjs";
 import Hamburger from "hamburger-react";
-import { Sparkles } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import React from "react";
 import Logo from "@components/atoms/Logo";
 import Navlinks from "@components/molecules/Navlinks";
 import { Button } from "@components/ui/button";
 import Animate from "../atoms/Animate";
+import UserNavigation from "../molecules/UserNavigation";
 import {
   Sheet,
   SheetContent,
@@ -23,23 +23,10 @@ import {
 
 function Navbar() {
   const pathname = usePathname();
-  const router = useRouter();
-  const { user } = useUser();
   const hidden = ["/suggestion"];
 
   if (hidden.includes(pathname)) return null;
 
-  // const handleSubscribe = () => {
-  //   // get the input id and focus on it
-  //   if (typeof window !== "undefined") {
-  //     const subscribe = document.getElementById("subscribe");
-  //     if (subscribe) {
-  //       subscribe.scrollTo({ behavior: "smooth", top: 20 });
-  //       // get the input and focus on it
-  //       subscribe.querySelector("input")?.focus();
-  //     }
-  //   }
-  // };
   return (
     <Animate
       dir="down"
@@ -64,22 +51,7 @@ function Navbar() {
                 </Link>
               </Button>
             </SignedOut>
-            <SignedIn>
-              <div className="flex items-center justify-center gap-3">
-                <Button className="w-36">Write a review</Button>
-                <UserButton userProfileUrl="/account">
-                  <UserButton.MenuItems>
-                    {!user?.publicMetadata?.onboarded && (
-                      <UserButton.Action
-                        label="Complete Profile"
-                        labelIcon={<Sparkles className="h-4 w-4" />}
-                        onClick={() => router.push("/onboarding")}
-                      />
-                    )}
-                  </UserButton.MenuItems>
-                </UserButton>
-              </div>
-            </SignedIn>
+            <UserNavigation />
           </div>
         </div>
         <MobileNav />
