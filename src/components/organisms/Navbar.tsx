@@ -1,11 +1,12 @@
 "use client";
 
 import { useDisclosure } from "@/hooks/useDisclosure";
-import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
+import { SignedIn, SignedOut, UserButton, useUser } from "@clerk/nextjs";
 import Hamburger from "hamburger-react";
+import { Sparkles } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import React from "react";
 import Logo from "@components/atoms/Logo";
 import Navlinks from "@components/molecules/Navlinks";
@@ -22,6 +23,8 @@ import {
 
 function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const { user } = useUser();
   const hidden = ["/suggestion"];
 
   if (hidden.includes(pathname)) return null;
@@ -49,9 +52,6 @@ function Navbar() {
         <div className="hidden flex-1 items-center justify-end gap-x-8 lg:flex">
           <Navlinks />
           <div className="space-x-4">
-            {/* <Button className="w-36" onClick={handleSubscribe}>
-              Subscribe
-            </Button> */}
             <SignedOut>
               <Button variant="outline" className="w-36" asChild>
                 <Link className="" href="/signup">
@@ -67,7 +67,17 @@ function Navbar() {
             <SignedIn>
               <div className="flex items-center justify-center gap-3">
                 <Button className="w-36">Write a review</Button>
-                <UserButton userProfileUrl="/account" />
+                <UserButton userProfileUrl="/account">
+                  <UserButton.MenuItems>
+                    {!user?.publicMetadata?.onboarded && (
+                      <UserButton.Action
+                        label="Complete Profile"
+                        labelIcon={<Sparkles className="h-4 w-4" />}
+                        onClick={() => router.push("/onboarding")}
+                      />
+                    )}
+                  </UserButton.MenuItems>
+                </UserButton>
               </div>
             </SignedIn>
           </div>
