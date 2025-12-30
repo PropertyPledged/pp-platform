@@ -3,6 +3,7 @@ import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 // define routes to access without AUTH
 const isPublicRoute = createRouteMatcher([
   "/",
+  "/api/webhooks/clerk(.*)",
   "/signin(.*)",
   "/signup(.*)",
   "/suggestion(.*)",
