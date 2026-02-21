@@ -1,27 +1,33 @@
 import { type SchemaTypeDefinition } from 'sanity'
 import { authorType } from './documents/authorType'
 import { categoryType } from './documents/categoryType'
+import { customForm } from './documents/customForm'
 import { pageType } from './documents/pageType'
 import { postType } from './documents/postType'
 import { siteSettings } from './documents/siteSettings'
 import { suggestion } from './documents/suggestion'
 import { blockContentType } from './objects/blockContentType'
 import { categoryOption } from './objects/categoryOption'
+import { formField } from './objects/formField'
+import { formStep } from './objects/formStep'
 import { response } from './objects/response'
 
 export const schema: { types: SchemaTypeDefinition[] } = {
-    types: [
-        // Documents
-        siteSettings,
-        pageType,
-        categoryType,
-        postType,
-        authorType,
-        suggestion,
+   types: [
+      // Documents
+      siteSettings,
+      pageType,
+      categoryType,
+      postType,
+      authorType,
+      suggestion,
+      customForm,
 
-        // Objects
-        response,
-        categoryOption,
-        blockContentType,
-    ],
+      // Objects
+      response,
+      categoryOption,
+      blockContentType,
+      formField,
+      formStep,
+   ],
 }

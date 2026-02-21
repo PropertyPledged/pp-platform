@@ -19,15 +19,32 @@ export const postsQuery = defineQuery(`{
       "posts": *[_type == 'post' && featured != true] | order(publishedAt desc)${post}
 }`)
 
-export const allPostsQuery = defineQuery(
-    `*[_type == 'post'] | order(publishedAt desc)${post}`,
-)
+export const allPostsQuery = defineQuery(`*[_type == 'post'] | order(publishedAt desc)${post}`)
 
-export const postQuery = defineQuery(
-    ` *[_type == 'post' && slug.current == $slug][0]${post}`,
-)
+export const postQuery = defineQuery(` *[_type == 'post' && slug.current == $slug][0]${post}`)
 
 // Suggestions
 export const suggestionsQuery = defineQuery(`*[_type == 'suggestion']{
   ...
   }`)
+
+// Forms
+export const formQuery = defineQuery(`*[_type == 'customForm' && slug.current == $slug][0]{
+  _id,
+  title,
+  layoutType,
+  slug,
+  steps[]{
+    _key,
+    stepTitle,
+    fields[]{
+      _key,
+      name,
+      label,
+      fieldType,
+      required,
+      placeholder,
+      options
+    }
+  }
+}`)
