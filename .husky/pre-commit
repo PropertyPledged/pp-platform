@@ -1,1 +1,2 @@
-pnpm lint
+# only target modified files
+pnpm exec lint-staged
