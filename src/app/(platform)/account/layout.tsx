@@ -8,7 +8,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
          <Navbar />
          <div className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-screen-2xl">
             <Sidebar />
-            <main className="flex flex-1 items-start justify-center overflow-y-auto p-8 px-20">{children}</main>
+            <main className="w-full overflow-y-auto p-8">{children}</main>
          </div>
       </div>
    )

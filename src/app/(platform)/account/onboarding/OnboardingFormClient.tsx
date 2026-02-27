@@ -1,7 +1,6 @@
 'use client'
 
 import { DynamicForm, SanityFormConfig } from '@/components/organisms/DynamicForm'
-import React from 'react'
 
 export function OnboardingFormClient({ formConfig }: { formConfig: SanityFormConfig }) {
    const handleSubmit = (data: any) => {

@@ -6,16 +6,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea'
 import React from 'react'
 import { useFormContext } from 'react-hook-form'
+import AddressAutocomplete from '../molecules/AddressAutocomplete'
 
 // Sanity field schema type
 export interface SanityFormField {
    _key: string
    name: string
    label: string
-   fieldType: 'string' | 'text' | 'boolean' | 'select' | 'radio'
+   fieldType: 'string' | 'email' | 'phone' | 'text' | 'boolean' | 'select' | 'radio' | 'address'
    required?: boolean
    placeholder?: string
-   options?: string[]
+   options?: any[] // Can be either string[] or { label: string; value: string }[]
 }
 
 interface FormInputRendererProps {
@@ -52,9 +53,9 @@ export function FormInputRenderer({ fieldConfig }: FormInputRendererProps) {
                   <FormLabel>{label}</FormLabel>
 
                   {/* Text Input */}
-                  {fieldType === 'string' && (
+                  {(fieldType === 'string' || fieldType === 'email' || fieldType === 'phone') && (
                      <FormControl>
-                        <Input placeholder={placeholder || ''} {...field} value={field.value || ''} className="h-12" />
+                        <Input type={fieldType === 'email' ? 'email' : fieldType === 'phone' ? 'tel' : 'text'} placeholder={placeholder || ''} {...field} value={field.value || ''} className="h-12" />
                      </FormControl>
                   )}
 
@@ -74,11 +75,15 @@ export function FormInputRenderer({ fieldConfig }: FormInputRendererProps) {
                            </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                           {options?.map((opt, i) => (
-                              <SelectItem key={i} value={opt}>
-                                 {opt}
-                              </SelectItem>
-                           ))}
+                           {options?.map((opt, i) => {
+                              const val = typeof opt === 'string' ? opt : opt.value
+                              const lbl = typeof opt === 'string' ? opt : opt.label
+                              return (
+                                 <SelectItem key={i} value={val}>
+                                    {lbl}
+                                 </SelectItem>
+                              )
+                           })}
                         </SelectContent>
                      </Select>
                   )}
@@ -87,17 +92,24 @@ export function FormInputRenderer({ fieldConfig }: FormInputRendererProps) {
                   {fieldType === 'radio' && (
                      <FormControl>
                         <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="mt-2 flex flex-col space-y-1">
-                           {options?.map((opt, i) => (
-                              <FormItem key={i} className="flex items-center space-y-0 space-x-3">
-                                 <FormControl>
-                                    <RadioGroupItem value={opt} />
-                                 </FormControl>
-                                 <FormLabel className="font-normal">{opt}</FormLabel>
-                              </FormItem>
-                           ))}
+                           {options?.map((opt, i) => {
+                              const val = typeof opt === 'string' ? opt : opt.value
+                              const lbl = typeof opt === 'string' ? opt : opt.label
+                              return (
+                                 <FormItem key={i} className="flex items-center space-y-0 space-x-3">
+                                    <FormControl>
+                                       <RadioGroupItem value={val} />
+                                    </FormControl>
+                                    <FormLabel className="font-normal">{lbl}</FormLabel>
+                                 </FormItem>
+                              )
+                           })}
                         </RadioGroup>
                      </FormControl>
                   )}
+
+                  {/* Address Autocomplete */}
+                  {fieldType === 'address' && <AddressAutocomplete control={control} addressFieldName={name} postcodeFieldName={`${name}_postcode`} label={label} placeholder={placeholder || undefined} />}
 
                   <FormMessage />
                </FormItem>

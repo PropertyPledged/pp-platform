@@ -1,4 +1,3 @@
-// import OnboardingForm from '@/components/onboarding/OnboardingForm'
 import { SanityFormConfig } from '@/components/organisms/DynamicForm'
 import { getFormBySlug } from '@/sanity/utils/getForm'
 import { notFound } from 'next/navigation'
@@ -11,7 +10,7 @@ export default async function OnboardingPage() {
    }
 
    return (
-      <div className="flex max-w-4xl bg-blue-500">
+      <div className="w-full">
          <OnboardingFormClient formConfig={form as SanityFormConfig} />
       </div>
    )

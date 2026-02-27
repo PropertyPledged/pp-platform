@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import React, { useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import Heading from '../atoms/Heading'
 import { FormInputRenderer, SanityFormField } from './FormInputRenderer'
 
 // --- Types ---
@@ -47,15 +48,21 @@ function buildZodSchema(steps: SanityFormStep[]) {
                fieldSchema = boolSchema
             }
          } else {
-            // String-based types: string, text, select, radio
+            // String-based types: string, text, select, radio, address, email, phone
             let strSchema = z.string()
+
+            if (field.fieldType === 'email') {
+               strSchema = strSchema.email({ message: 'Please enter a valid email address' })
+            }
+
             if (field.required) {
                strSchema = strSchema.min(1, { message: 'This field is required' })
-            } else {
-               fieldSchema = strSchema.optional()
-            }
-            if (field.required) {
                fieldSchema = strSchema
+            } else {
+               // If it's an optional email, z.string().email() still requires a valid email.
+               // Zod requires empty strings to either be omitted or ignored unless we use z.union([z.string().email(), z.literal('')]) or .optional().
+               // To allow empty strings for non-required fields:
+               fieldSchema = strSchema.optional().or(z.literal(''))
             }
          }
 
@@ -125,29 +132,27 @@ export function DynamicForm({ config, onSubmit }: DynamicFormProps) {
    }
 
    return (
-      <div className="flex w-full flex-col items-center justify-center p-8">
+      <div className="flex w-full flex-col items-start justify-start p-8">
          <div className="flex w-full max-w-xl flex-col gap-6">
-            {/* Header */}
-            <div className="flex flex-col items-center gap-2 text-center">
-               {config.title && <h2 className="text-2xl font-semibold tracking-tight">{config.title}</h2>}
-               {isStepped && (
-                  <p className="text-muted-foreground text-sm">
-                     Step {currentStepIndex + 1} of {formSteps.length}
-                  </p>
-               )}
-            </div>
+            {config.title && <Heading className="text-2xl font-semibold tracking-tight">{config.title}</Heading>}
 
-            {/* Step Indicator (Multi-step only) */}
             {isStepped && formSteps.length > 1 && (
-               <div className="mb-8 flex items-center justify-center space-x-4">
+               <div className="mb-8 flex items-center justify-start space-x-4">
                   {formSteps.map((step, index) => (
-                     <React.Fragment key={step._key || index}>
-                        <div className="flex items-center space-x-2">
-                           <div className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium transition-colors ${index <= currentStepIndex ? 'bg-[#001F3F] text-white' : 'bg-slate-100 text-slate-400'}`}>{index + 1}</div>
-                           <span className={`hidden text-sm font-medium sm:inline-block ${index <= currentStepIndex ? 'text-[#001F3F]' : 'text-slate-400'}`}>{step.stepTitle}</span>
+                     <div key={step._key || index} className="flex items-center">
+                        <div className={`flex items-center space-x-2 ${currentStepIndex >= index ? 'text-gray-900' : 'text-gray-400'}`}>
+                           <div className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] ${currentStepIndex > index ? 'bg-orange-500 text-white' : currentStepIndex === index ? 'border-2 border-slate-600 bg-slate-600' : 'border-2 border-gray-200 bg-gray-200'}`}>
+                              {currentStepIndex > index && (
+                                 <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                 </svg>
+                              )}
+                              {currentStepIndex === index && <div className="h-2 w-2 rounded-full bg-white" />}
+                           </div>
+                           <span className="text-sm font-medium">{step.stepTitle}</span>
                         </div>
-                        {index < formSteps.length - 1 && <div className={`h-px w-12 ${index < currentStepIndex ? 'bg-[#001F3F]' : 'bg-slate-200'}`} />}
-                     </React.Fragment>
+                        {index < formSteps.length - 1 && <div className="mx-4 h-px w-12 bg-gray-200" />}
+                     </div>
                   ))}
                </div>
             )}
@@ -157,7 +162,11 @@ export function DynamicForm({ config, onSubmit }: DynamicFormProps) {
                <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6">
                   {/* Render Standard mode: all steps at once. Render Stepped mode: current step only */}
                   {isStepped ? (
-                     <div className="animate-in fade-in slide-in-from-bottom-2 space-y-6 duration-300">{currentStep?.fields?.map((field: any) => <FormInputRenderer key={field._key || field.name} fieldConfig={field} />)}</div>
+                     <div className="animate-in fade-in slide-in-from-bottom-2 space-y-6 duration-300">
+                        {currentStep?.fields?.map((field: any) => (
+                           <FormInputRenderer key={field._key || field.name} fieldConfig={field} />
+                        ))}
+                     </div>
                   ) : (
                      <div className="space-y-8">
                         {formSteps.map((step) => (
@@ -172,21 +181,19 @@ export function DynamicForm({ config, onSubmit }: DynamicFormProps) {
                   )}
 
                   {/* Navigation / Submit Buttons */}
-                  <div className="flex justify-between gap-4 pt-6">
-                     {isStepped && !isFirstStep ? (
+                  <div className="flex justify-start gap-4 pt-6">
+                     {isStepped && !isFirstStep && (
                         <Button type="button" variant="outline" className="h-12 flex-1" onClick={handleBack}>
                            Previous Step
                         </Button>
-                     ) : (
-                        <div></div> // Spacer to keep Next/Submit aligned right if no Back button
                      )}
 
                      {isStepped && !isLastStep ? (
-                        <Button type="button" className="h-12 flex-1 bg-[#001F3F] text-white hover:bg-[#001F3F]/90" onClick={handleNext}>
+                        <Button type="button" className="h-12 bg-[#001F3F] text-white hover:bg-[#001F3F]/90" onClick={handleNext}>
                            Continue
                         </Button>
                      ) : (
-                        <Button type="submit" className="h-12 flex-1 bg-[#001F3F] text-white hover:bg-[#001F3F]/90">
+                        <Button type="submit" className="h-12 bg-[#001F3F] text-white hover:bg-[#001F3F]/90">
                            {isStepped ? 'Complete Form' : 'Submit'}
                         </Button>
                      )}

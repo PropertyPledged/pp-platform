@@ -1,5 +1,5 @@
 import { DocumentTextIcon } from '@sanity/icons'
-import { defineField, defineType } from 'sanity'
+import { defineField, defineType, defineArrayMember } from 'sanity'
 
 export const formField = defineType({
    name: 'formField',
@@ -31,10 +31,13 @@ export const formField = defineType({
          options: {
             list: [
                { title: 'Text (Single Line)', value: 'string' },
+               { title: 'Email Address', value: 'email' },
+               { title: 'Phone Number', value: 'phone' },
                { title: 'Text Area (Multi-line)', value: 'text' },
                { title: 'Checkbox (Boolean)', value: 'boolean' },
                { title: 'Select Dropdown', value: 'select' },
                { title: 'Radio Group', value: 'radio' },
+               { title: 'Address Autocomplete', value: 'address' },
             ],
             layout: 'radio',
          },
@@ -56,7 +59,16 @@ export const formField = defineType({
          name: 'options',
          title: 'Options (for Select / Radio types)',
          type: 'array',
-         of: [{ type: 'string' }],
+         of: [
+            defineArrayMember({
+               type: 'object',
+               name: 'option',
+               fields: [defineField({ name: 'label', title: 'Label', type: 'string', validation: (Rule) => Rule.required() }), defineField({ name: 'value', title: 'Value', type: 'string', validation: (Rule) => Rule.required() })],
+               preview: {
+                  select: { title: 'label', subtitle: 'value' },
+               },
+            }),
+         ],
          hidden: ({ parent }) => parent?.fieldType !== 'select' && parent?.fieldType !== 'radio',
          validation: (Rule) =>
             Rule.custom((options, context) => {
