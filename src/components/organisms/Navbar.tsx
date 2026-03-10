@@ -35,19 +35,19 @@ function Navbar() {
       className="sticky top-0 left-0 z-20 h-14 w-full border-b border-gray-200 bg-gray-50 px-6 md:h-16 2xl:px-0"
     >
       <div className="mx-auto flex h-full w-full max-w-screen-2xl items-center justify-between gap-x-4">
-        <Logo />
+        <Logo className="size-8" />
         <div className="hidden flex-1 items-center justify-end gap-x-8 lg:flex">
           <Navlinks />
           <div className="space-x-4">
             <SignedOut>
-              <Button variant="outline" className="w-36" asChild>
-                <Link className="" href="/signup">
-                  Join Us
+              <Button variant="ghost" className="w-36 bg-gray-100 hover:bg-gray-200" asChild>
+                <Link className="" href="/signin">
+                  Sign In
                 </Link>
               </Button>
               <Button className="w-36" asChild>
-                <Link className="" href="/signin">
-                  Sign In
+                <Link className="" href="/signup">
+                  Join Us
                 </Link>
               </Button>
             </SignedOut>
@@ -93,7 +93,7 @@ function MobileNav() {
       </SheetTrigger>
       <SheetContent className="h-screen w-screen space-y-9" side="left">
         <SheetHeader className="h-16 max-w-screen">
-          <Logo />
+          <Logo className='size-10' />
           <SheetTitle></SheetTitle>
           <SheetDescription></SheetDescription>
         </SheetHeader>

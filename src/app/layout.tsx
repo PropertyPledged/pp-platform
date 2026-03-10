@@ -1,5 +1,6 @@
 import { DisableDraftMode } from '@/components/sanity/DisableDraftMode'
 import { Toaster } from '@/components/ui/sonner'
+import { UserSync } from '@/components/auth/UserSync'
 import '@/styles/globals.css'
 import { TRPCReactProvider } from '@/trpc/react'
 import { ClerkProvider } from '@clerk/nextjs'
@@ -10,6 +11,8 @@ import { Poppins } from 'next/font/google'
 import { draftMode } from 'next/headers'
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
+import { NuqsAdapter } from 'nuqs/adapters/next'
+
 
 const poppins = Poppins({
    subsets: ['latin'],
@@ -29,6 +32,8 @@ async function RootLayout({ children }: RootLayoutProps) {
    return (
       <html lang="en" className={poppins.className}>
          <body className={poppins.className}>
+            <NuqsAdapter>
+
             <ClerkProvider>
                <NextTopLoader color="#001F3F" />
                {(await draftMode()).isEnabled && (
@@ -37,11 +42,15 @@ async function RootLayout({ children }: RootLayoutProps) {
                      <DisableDraftMode />
                   </>
                )}
-               <TRPCReactProvider>{children}</TRPCReactProvider>
+               <TRPCReactProvider>
+                  <UserSync />
+                  {children}
+               </TRPCReactProvider>
                <Toaster />
                <SpeedInsights />
                <Analytics />
             </ClerkProvider>
+               </NuqsAdapter>
          </body>
       </html>
    )

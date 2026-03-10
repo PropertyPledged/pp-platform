@@ -55,14 +55,11 @@ export default function CustomSignInForm() {
   };
 
   return (
-    <div className="flex w-full flex-col items-center justify-center p-8">
-      <div className="absolute left-8 top-8">
-        <Logo />
-      </div>
-      
-      <div className="mt-20 flex w-full max-w-[400px] flex-col gap-6">
+    <div className="flex min-h-screen w-full flex-col items-center justify-center p-8">
+      <div className="flex w-full max-w-[400px] flex-col gap-6">
         <div className="flex flex-col items-center gap-2 text-center">
-          <h1 className="text-2xl font-semibold tracking-tight">Welcome Back!</h1>
+          <Logo className="w-16" />
+          <h1 className="text-2xl font-semibold tracking-tight mt-4">Welcome Back!</h1>
           <p className="text-muted-foreground text-sm">
             Sign into your account with your preferred social media account
           </p>

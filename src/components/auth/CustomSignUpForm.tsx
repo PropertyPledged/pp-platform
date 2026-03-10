@@ -81,9 +81,9 @@ export default function CustomSignUpForm() {
 
   if (verifying) {
     return (
-      <div className="flex w-full flex-col items-center justify-center gap-6 p-8">
-        <div className="mb-8">
-            <Logo />
+      <div className="flex min-h-screen w-full flex-col items-center justify-center gap-6 p-8">
+        <div className="mb-2">
+            <Logo className="w-12 py-0" />
         </div>
         <h1 className="text-2xl font-semibold tracking-tight">Verify your email</h1>
         <p className="text-muted-foreground text-center text-sm">
@@ -109,14 +109,11 @@ export default function CustomSignUpForm() {
   }
 
   return (
-    <div className="flex w-full flex-col items-center justify-center p-8">
-      <div className="absolute left-8 top-8">
-        <Logo />
-      </div>
-      
-      <div className="mt-20 flex w-full max-w-[400px] flex-col gap-6">
+    <div className="flex min-h-screen w-full flex-col items-center justify-center p-8">
+      <div className="flex w-full max-w-[400px] flex-col gap-6">
         <div className="flex flex-col items-center gap-2 text-center">
-          <h1 className="text-2xl font-semibold tracking-tight">Create Your Account</h1>
+          <Logo className="w-16" />
+          <h1 className="text-2xl font-semibold tracking-tight mt-4">Create Your Account</h1>
           <p className="text-muted-foreground text-sm">
             Sign up quickly with your preferred social media account
           </p>
