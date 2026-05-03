@@ -43,7 +43,7 @@ export const accounts = createTable("account", {
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
   accountId: varchar("account_id", { length: 256 }).notNull(),
-  provider: varchar("provider", { length: 256 }).notNull(),
+  providerId: varchar("provider", { length: 256 }).notNull(),
   providerAccountId: varchar("provider_account_id", { length: 256 }).notNull(),
   refreshToken: text("refresh_token"),
   accessToken: text("access_token"),
