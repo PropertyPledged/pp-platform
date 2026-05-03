@@ -1,31 +1,52 @@
-import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
+import { type NextRequest } from "next/server";
+import { auth } from "@/server/auth";
 
-// define routes to access without AUTH
-const isPublicRoute = createRouteMatcher([
-   '/',
-   '/api/webhooks/clerk(.*)',
-   '/signin(.*)',
-   '/signup(.*)',
-   '/suggestion(.*)',
-   '/about-us',
-   '/blog(.*)',
-   '/studio(.*)',
-   '/unsubscribe',
-   '/sitemap(.*)', // sitemap.xml, sitemap, sitemap.xml.gz
-   '/robots.txt',
-   '/community(.*)',
-])
+const publicRoutes = [
+  "/",
+  "/signin",
+  "/signup",
+  "/suggestion",
+  "/about-us",
+  "/blog",
+  "/studio",
+  "/unsubscribe",
+  "/sitemap",
+  "/robots.txt",
+  "/community",
+];
 
-export default clerkMiddleware(async (auth, req) => {
-   if (!isPublicRoute(req)) await auth.protect()
-})
+function isPublicRoute(pathname: string): boolean {
+  return publicRoutes.some((route) => {
+    if (route.endsWith("*")) {
+      return pathname.startsWith(route.slice(0, -1));
+    }
+    return pathname === route || pathname.startsWith(route + "/");
+  });
+}
+
+const STATIC_FILE_REGEX = /\.(?:png|jpg|jpeg|gif|svg|ico|webp|avif|mp4|mp3|pdf|woff2?|ttf|eot)$/i;
+
+export async function proxy(request: NextRequest) {
+  const pathname = new URL(request.url).pathname;
+
+  if (isPublicRoute(pathname) || pathname.startsWith("/api") || STATIC_FILE_REGEX.test(pathname)) {
+    return null;
+  }
+
+  const session = await auth.api.getSession({
+    headers: request.headers,
+  });
+
+  if (!session) {
+    const url = new URL("/signin", request.url);
+    return Response.redirect(url);
+  }
+
+  return null;
+}
 
 export const config = {
-   matcher: [
-      // Skip Next.js internals and all static files, unless found in search params
-      '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
-      // Always run for API routes
-      '/(api|trpc)(.*)',
-      // skip marketing & feedback pages
-   ],
-}
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico).*)",
+  ],
+};

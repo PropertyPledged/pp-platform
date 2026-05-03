@@ -4,6 +4,10 @@ import { env } from '@/env'
 import { resend } from '@/lib/resend'
 import { type CreateContactOptions } from 'resend'
 import { draftMode } from 'next/headers'
+import { db } from '@/server/db'
+import { users } from '@/server/db/schema'
+import { eq } from 'drizzle-orm'
+import { auth } from '@/server/auth'
 
 export const addContact = async (contact: CreateContactOptions) => {
     return await resend.contacts.create({
@@ -16,4 +20,29 @@ export async function disableDraftMode() {
     const disable = (await draftMode()).disable()
     const delay = new Promise((resolve) => setTimeout(resolve, 1000))
     await Promise.allSettled([disable, delay])
+}
+
+type OnboardingPayload = {
+    name: string
+    role: 'tenant' | 'leaseholder' | 'landlord'
+    phoneNumber?: string
+}
+
+export async function markUserAsOnboarded(payload: OnboardingPayload) {
+    const session = await auth.api.getSession({
+        headers: await import('next/headers').then(m => m.headers()),
+    })
+    
+    if (!session?.user?.id) {
+        throw new Error('Not authenticated')
+    }
+    
+    await db.update(users)
+        .set({
+            onboarded: true,
+            name: payload.name,
+            role: payload.role,
+            phoneNumber: payload.phoneNumber?.trim() || null,
+        })
+        .where(eq(users.id, session.user.id))
 }

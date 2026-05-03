@@ -16,7 +16,6 @@ import {
   Building3,
   ArrowLeft2,
   ArrowRight2,
-  ShieldTick,
 } from "iconsax-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -28,6 +27,7 @@ import {
   CardDescription,
   CardFooter,
 } from "@components/ui/card";
+import { VerificationBadge } from "@/components/atoms/VerificationBadge";
 
 const abouts = [
   {
@@ -150,11 +150,7 @@ export default async function Home() {
                         />
                         <Text as="span">Maple Apartments, London</Text>
                       </CardTitle>
-                      <ShieldTick
-                        size={26}
-                        className="text-green-500"
-                        color="currentColor"
-                      />
+                      <VerificationBadge isVerified={true} />
                     </CardHeader>
                     <CardContent>
                       <CardDescription>

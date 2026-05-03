@@ -15,9 +15,9 @@ function AuthLayout({ children }: AuthLayoutProps) {
           height={500}
           src="/wavy2.png"
           alt="wavy auth"
+          loading="eager"
           className="h-full w-full scale-105"
         />
-        
       </div>
     </div>
   );
