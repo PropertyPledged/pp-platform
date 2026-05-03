@@ -18,9 +18,16 @@ export const env = createEnv({
     SANITY_VIEWER_TOKEN: z.string({
       message: "SANITY_VIEWR_TOKEN is required for sanity io",
     }),
-    CLERK_SECRET_KEY: z
-      .string({ message: "CLERK SECRET KEY is required" })
-      .min(1, { message: "CLERK SECRET KEY is required" }),
+    BETTER_AUTH_SECRET: z
+      .string({ message: "BETTER_AUTH_SECRET is required" })
+      .min(1, { message: "BETTER_AUTH_SECRET is required" }),
+    BETTER_AUTH_URL: z
+      .string({ message: "BETTER_AUTH_URL is required" })
+      .url("BETTER_AUTH_URL must be a valid URL"),
+    GOOGLE_CLIENT_ID: z.string().optional(),
+    GOOGLE_CLIENT_SECRET: z.string().optional(),
+    APPLE_CLIENT_ID: z.string().optional(),
+    APPLE_CLIENT_SECRET: z.string().optional(),
   },
 
   /**
@@ -30,7 +37,6 @@ export const env = createEnv({
    */
   client: {
     // NEXT_PUBLIC_CLIENTVAR: z.string(),
-    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string().optional(),
   },
 
   /**
@@ -43,10 +49,12 @@ export const env = createEnv({
     RESEND_API_KEY: process.env.RESEND_API_KEY,
     RESEND_AUDIENCE_ID: process.env.RESEND_AUDIENCE_ID,
     SANITY_VIEWER_TOKEN: process.env.SANITY_VIEWER_TOKEN,
-    // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
-    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY:
-      process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
-    CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY,
+    BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET,
+    BETTER_AUTH_URL: process.env.BETTER_AUTH_URL,
+    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+    GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+    APPLE_CLIENT_ID: process.env.APPLE_CLIENT_ID,
+    APPLE_CLIENT_SECRET: process.env.APPLE_CLIENT_SECRET,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

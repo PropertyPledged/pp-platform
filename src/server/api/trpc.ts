@@ -8,6 +8,7 @@
  */
 import { resend } from '@/lib/resend'
 import { db } from '@/server/db'
+import { auth } from '@/server/auth'
 import { initTRPC } from '@trpc/server'
 import superjson from 'superjson'
 import { ZodError } from 'zod'
@@ -25,9 +26,14 @@ import { ZodError } from 'zod'
  * @see https://trpc.io/docs/server/context
  */
 export const createTRPCContext = async (opts: { headers: Headers }) => {
+    const session = await auth.api.getSession({
+        headers: opts.headers,
+    })
+    
     return {
         db,
         resend,
+        session,
         ...opts,
     }
 }
@@ -107,3 +113,23 @@ const timingMiddleware = t.middleware(async ({ next, path }) => {
  * are logged in.
  */
 export const publicProcedure = t.procedure.use(timingMiddleware)
+
+/**
+ * Protected (authenticated) procedure
+ *
+ * If you want a query or mutation to ONLY be accessible to logged in users, use this instead.
+ * It verifies the session is present before proceeding.
+ */
+export const protectedProcedure = t.procedure
+    .use(timingMiddleware)
+    .use(async ({ ctx, next }) => {
+        if (!ctx.session?.user) {
+            throw new Error('Unauthorized')
+        }
+        return next({
+            ctx: {
+                ...ctx,
+                session: ctx.session,
+            },
+        })
+    })

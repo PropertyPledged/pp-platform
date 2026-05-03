@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { useUser } from "@clerk/nextjs";
+import { useSession } from "@/lib/auth-client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,6 +10,9 @@ import { Form } from "@/components/ui/form";
 import StepPersonalDetails from "./steps/StepPersonalDetails";
 import StepPropertyInfo from "./steps/StepPropertyInfo";
 import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { markUserAsOnboarded } from "@/server/actions";
 
 const onboardingSchema = z.object({
   // Personal Details
@@ -36,8 +39,10 @@ const STEPS = [
 ];
 
 export default function OnboardingForm() {
-  const { user, isLoaded } = useUser();
+  const { data: session } = useSession();
   const [currentStep, setCurrentStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
 
   const form = useForm<OnboardingValues>({
     resolver: zodResolver(onboardingSchema),
@@ -55,15 +60,15 @@ export default function OnboardingForm() {
   });
 
   useEffect(() => {
-    if (isLoaded && user) {
-      if (!form.getValues("name") && user.fullName) {
-        form.setValue("name", user.fullName);
+    if (session?.user) {
+      if (!form.getValues("name") && session.user.name) {
+        form.setValue("name", session.user.name);
       }
-      if (!form.getValues("email") && user.primaryEmailAddress?.emailAddress) {
-        form.setValue("email", user.primaryEmailAddress.emailAddress);
+      if (!form.getValues("email") && session.user.email) {
+        form.setValue("email", session.user.email);
       }
     }
-  }, [isLoaded, user, form]);
+  }, [session, form]);
 
   const handleNext = async () => {
     const fieldsToValidate =
@@ -82,9 +87,22 @@ export default function OnboardingForm() {
     setCurrentStep((prev) => Math.max(prev - 1, 1));
   };
 
-  const onSubmit = (data: OnboardingValues) => {
-    console.log("Form submitted:", data);
-    // TODO: Submit to API
+  const onSubmit = async (data: OnboardingValues) => {
+    setIsSubmitting(true);
+    try {
+      // TODO: Submit onboarding data to API
+      console.log("Form submitted:", data);
+      
+      // Mark user as onboarded
+      await markUserAsOnboarded();
+      toast.success("Profile completed successfully!");
+      router.push("/dashboard");
+    } catch (error) {
+      toast.error("Failed to complete profile");
+      console.error(error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -172,9 +190,10 @@ export default function OnboardingForm() {
                   </button>
                   <button
                     type="submit"
-                    className="w-full rounded-md bg-slate-900 py-3 text-sm font-medium text-white hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2"
+                    disabled={isSubmitting}
+                    className="w-full rounded-md bg-slate-900 py-3 text-sm font-medium text-white hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Complete profile
+                    {isSubmitting ? "Completing..." : "Complete profile"}
                   </button>
                 </div>
               )}

@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { useSignUp } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -10,72 +9,75 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import Logo from "@/components/atoms/Logo";
 import { toast } from "sonner";
+import { signUp, signIn, verifyEmail } from "@/lib/auth-client";
 
 export default function CustomSignUpForm() {
-  const { isLoaded, signUp, setActive } = useSignUp();
   const [emailAddress, setEmailAddress] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const [name, setName] = React.useState("");
   const [verifying, setVerifying] = React.useState(false);
   const [code, setCode] = React.useState("");
+  const [isLoading, setIsLoading] = React.useState(false);
   const router = useRouter();
 
   // Handle OAuth sign up
-  const signUpWith = (strategy: "oauth_google" | "oauth_facebook" | "oauth_apple") => {
-    if (!isLoaded) return;
-
-    return signUp.authenticateWithRedirect({
-      strategy,
-      redirectUrl: "/sso-callback",
-      redirectUrlComplete: "/",
-    });
+  const signUpWith = async (provider: "google" | "apple") => {
+    setIsLoading(true);
+    try {
+      await signIn.social({
+        provider,
+        callbackURL: "/",
+      });
+    } catch (error) {
+      toast.error("Failed to sign up with " + provider);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Handle email/password sign up
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isLoaded) return;
+    setIsLoading(true);
 
     try {
-      await signUp.create({
-        emailAddress,
+      const result = await signUp.email({
+        email: emailAddress,
         password,
+        name,
       });
 
-      // Send email verification code
-      await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
-
-      setVerifying(true);
+      if (result.data) {
+        setVerifying(true);
+      }
     } catch (err: unknown) {
-      console.error(JSON.stringify(err, null, 2));
-      const errors = (err as { errors?: { message: string }[] }).errors;
-      toast.error(errors?.[0]?.message ?? "Something went wrong");
+      const error = err as { message?: string };
+      toast.error(error.message ?? "Something went wrong");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   // Handle email verification
   const handleVerification = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isLoaded) return;
+    setIsLoading(true);
 
     try {
-      const completeSignUp = await signUp.attemptEmailAddressVerification({
-        code,
+      const result = await verifyEmail({
+        query: {
+          token: code,
+        },
       });
 
-      if (completeSignUp.status !== "complete") {
-        /*  investigate the response, to see if there was an error
-         or if the user needs to complete more steps.*/
-        console.log(JSON.stringify(completeSignUp, null, 2));
-      }
-
-      if (completeSignUp.status === "complete") {
-        await setActive({ session: completeSignUp.createdSessionId });
+      if (result.data) {
         router.push("/");
       }
     } catch (err: unknown) {
-      console.error(JSON.stringify(err, null, 2));
-      const errors = (err as { errors?: { message: string }[] }).errors;
-      toast.error(errors?.[0]?.message ?? "Verification failed");
+      const error = err as { message?: string };
+      toast.error(error.message ?? "Verification failed");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -83,13 +85,16 @@ export default function CustomSignUpForm() {
     return (
       <div className="flex w-full flex-col items-center justify-center gap-6 p-8">
         <div className="mb-8">
-            <Logo />
+          <Logo />
         </div>
         <h1 className="text-2xl font-semibold tracking-tight">Verify your email</h1>
         <p className="text-muted-foreground text-center text-sm">
           We sent a code to <span className="font-medium">{emailAddress}</span>
         </p>
-        <form onSubmit={handleVerification} className="w-full max-w-sm space-y-4">
+        <form
+          onSubmit={handleVerification}
+          className="w-full max-w-sm space-y-4"
+        >
           <div className="space-y-2">
             <Label htmlFor="code">Verification Code</Label>
             <Input
@@ -98,10 +103,15 @@ export default function CustomSignUpForm() {
               onChange={(e) => setCode(e.target.value)}
               placeholder="Enter verification code"
               required
+              disabled={isLoading}
             />
           </div>
-          <Button type="submit" className="w-full bg-[#001F3F] text-white hover:bg-[#001F3F]/90">
-            Verify Email
+          <Button
+            type="submit"
+            className="w-full bg-[#001F3F] text-white hover:bg-[#001F3F]/90"
+            disabled={isLoading}
+          >
+            {isLoading ? "Verifying..." : "Verify Email"}
           </Button>
         </form>
       </div>
@@ -113,10 +123,12 @@ export default function CustomSignUpForm() {
       <div className="absolute left-8 top-8">
         <Logo />
       </div>
-      
+
       <div className="mt-20 flex w-full max-w-[400px] flex-col gap-6">
         <div className="flex flex-col items-center gap-2 text-center">
-          <h1 className="text-2xl font-semibold tracking-tight">Create Your Account</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">
+            Create Your Account
+          </h1>
           <p className="text-muted-foreground text-sm">
             Sign up quickly with your preferred social media account
           </p>
@@ -126,7 +138,8 @@ export default function CustomSignUpForm() {
           <Button
             variant="outline"
             className="flex-1 gap-2 h-12"
-            onClick={() => signUpWith("oauth_google")}
+            onClick={() => signUpWith("google")}
+            disabled={isLoading}
           >
             <svg className="h-5 w-5" viewBox="0 0 24 24">
               <path
@@ -151,22 +164,13 @@ export default function CustomSignUpForm() {
           <Button
             variant="outline"
             className="flex-1 gap-2 h-12"
-            onClick={() => signUpWith("oauth_facebook")}
-          >
-            <svg className="h-5 w-5" fill="#1877F2" viewBox="0 0 24 24">
-              <path d="M9.101 23.691v-7.98H6.627v-3.667h2.474v-1.58c0-4.085 1.848-5.978 5.858-5.978.401 0 .955.042 1.468.103a8.68 8.68 0 0 1 1.141.195v3.325a8.623 8.623 0 0 0-.653-.036c-2.148 0-2.971.956-2.971 3.594v.449h5.517l-.542 3.667h-4.975v7.98H9.101z" />
-            </svg>
-            Facebook
-          </Button>
-          <Button
-            variant="outline"
-            className="flex-1 gap-2 h-12"
-            onClick={() => signUpWith("oauth_apple")}
+            onClick={() => signUpWith("apple")}
+            disabled={isLoading}
           >
             <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-               <path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.127 3.675-.552 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.403-2.363-2-.039-3.714 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701" />
+              <path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.127 3.675-.552 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.403-2.363-2-.039-3.714 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701" />
             </svg>
-            Apple ID
+            Apple
           </Button>
         </div>
 
@@ -181,10 +185,26 @@ export default function CustomSignUpForm() {
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
+            <Label htmlFor="name">Full Name</Label>
+            <Input
+              id="name"
+              type="text"
+              placeholder="John Doe"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              className="h-12"
+              disabled={isLoading}
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
             <Label htmlFor="email">Sign up with your email</Label>
             <div className="space-y-1">
-                <Label htmlFor="email" className="sr-only">Your email</Label>
-                <Input
+              <Label htmlFor="email" className="sr-only">
+                Your email
+              </Label>
+              <Input
                 id="email"
                 type="email"
                 placeholder="janedoe@gmail.com"
@@ -192,51 +212,56 @@ export default function CustomSignUpForm() {
                 onChange={(e) => setEmailAddress(e.target.value)}
                 required
                 className="h-12"
-                />
+                disabled={isLoading}
+              />
             </div>
           </div>
-          
-          {/* We might need password field too for email/password signup, 
-              although the design only shows email initially. 
-              Usually "Sign up with email" implies entering password too, 
-              or a magic link flow. Clerk's create({ emailAddress, password }) requires password.
-              I will add password field to be safe and functional. 
-              If the design implies magic link, I would need to change strategy.
-              But standard "Create account" usually means password.
-          */}
-           <div className="flex flex-col gap-2">
-             <Label htmlFor="password">Password</Label>
-             <Input
-               id="password"
-               type="password"
-               placeholder="Create a password"
-               value={password}
-               onChange={(e) => setPassword(e.target.value)}
-               required
-               className="h-12"
-             />
-           </div>
 
-          <Button type="submit" className="h-12 w-full bg-[#001F3F] text-white hover:bg-[#001F3F]/90">
-            Create my account
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
+              type="password"
+              placeholder="Create a password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="h-12"
+              disabled={isLoading}
+            />
+          </div>
+
+          <Button
+            type="submit"
+            className="h-12 w-full bg-[#001F3F] text-white hover:bg-[#001F3F]/90"
+            disabled={isLoading}
+          >
+            {isLoading ? "Creating account..." : "Create my account"}
           </Button>
         </form>
 
         <div className="text-center text-sm">
           Already have an account?{" "}
-          <Link href="/signin" className="font-semibold text-[#001F3F] hover:underline">
+          <Link
+            href="/signin"
+            className="font-semibold text-[#001F3F] hover:underline"
+          >
             Login here
           </Link>
         </div>
 
         <div className="mt-auto text-center text-xs text-muted-foreground">
-            <p>
-                <span className="font-semibold text-[#001F3F]">We value your privacy.</span> Your information is secure and will not be shared without your permission.
-            </p>
+          <p>
+            <span className="font-semibold text-[#001F3F]">
+              We value your privacy.
+            </span>{" "}
+            Your information is secure and will not be shared without your
+            permission.
+          </p>
         </div>
-        
+
         <div className="mt-8 text-center text-xs text-muted-foreground">
-            Property Pledge 2024
+          Property Pledge 2024
         </div>
       </div>
     </div>
