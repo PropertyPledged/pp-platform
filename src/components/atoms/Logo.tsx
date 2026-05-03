@@ -1,10 +1,19 @@
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
+import { cn } from "@/lib/utils";
 
-function Logo() {
+interface LogoProps {
+  className?: string;
+}
+
+function Logo({ className }: LogoProps) {
   return (
-    <Link href="/" passHref className="my-auto h-full w-16 cursor-pointer py-3">
+    <Link 
+      href="/" 
+      passHref 
+      className={cn("flex items-center justify-center cursor-pointer", className)}
+    >
       <Image
         src="/pplogo.png"
         alt="logo"
@@ -12,7 +21,7 @@ function Logo() {
         width={100}
         height={100}
         unoptimized={true}
-        className="h-full w-auto object-contain"
+        className="h-auto w-auto object-contain"
       />
     </Link>
   );

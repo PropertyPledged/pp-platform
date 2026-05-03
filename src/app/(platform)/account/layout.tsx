@@ -9,7 +9,7 @@ export default function AccountLayout({
 }) {
   return (
     <div className="flex min-h-screen flex-col">
-      <Navbar />
+      {/* <Navbar /> */}
       <div className="flex min-h-[calc(100vh-4rem)] max-w-screen-2xl mx-auto w-full">
         <Sidebar />
         <main className="flex-1 p-8 overflow-y-auto">

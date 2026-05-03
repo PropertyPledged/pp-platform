@@ -1,0 +1,7 @@
+ignoredBuiltDependencies:
+  - esbuild
+  - sharp
+
+onlyBuiltDependencies:
+  - '@clerk/shared'
+  - '@vercel/speed-insights'
