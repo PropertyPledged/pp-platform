@@ -31,6 +31,8 @@ export const users = createTable("user", {
   emailVerified: boolean("email_verified").notNull().default(false),
   image: text("image"),
   onboarded: boolean("onboarded").notNull().default(false),
+  role: varchar("role", { length: 32 }),
+  phoneNumber: varchar("phone_number", { length: 32 }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true })
     .$onUpdate(() => new Date())
@@ -50,6 +52,7 @@ export const accounts = createTable("account", {
   refreshTokenExpiresAt: timestamp("refresh_token_expires_at", { withTimezone: true }),
   scope: text("scope"),
   idToken: text("id_token"),
+  password: text("password"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true })
     .$onUpdate(() => new Date())
@@ -76,6 +79,6 @@ export const verifications = createTable("verification", {
   identifier: varchar("identifier", { length: 256 }).notNull(),
   value: text("value").notNull(),
   expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
-  createdAt: timestamp("created_at", { withTimezone: true }),
-  updatedAt: timestamp("updated_at", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(() => new Date()),
 });

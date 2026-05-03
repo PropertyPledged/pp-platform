@@ -8,34 +8,32 @@ import * as z from "zod";
 import { Card, CardContent } from "@/components/ui/card";
 import { Form } from "@/components/ui/form";
 import StepPersonalDetails from "./steps/StepPersonalDetails";
-import StepPropertyInfo from "./steps/StepPropertyInfo";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { markUserAsOnboarded } from "@/server/actions";
+import { Building2, Search, ShieldCheck, Star } from "lucide-react";
 
 const onboardingSchema = z.object({
-  // Personal Details
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Invalid email address"),
-  phone: z.string().min(10, "Phone number must be at least 10 characters"),
   role: z.enum(["tenant", "landlord", "leaseholder"], {
     required_error: "Please select a role",
   }),
-
-  // Property Information (Optional for now, or required based on step)
-  location: z.string().optional(),
-  address: z.string().optional(),
-  propertyType: z.string().optional(),
-  duration: z.string().optional(),
-  leaseAgreement: z.any().optional(),
+  phone: z
+    .string()
+    .optional()
+    .refine((value) => !value || value.trim().length >= 7, "Please enter a valid phone number"),
+  destination: z.enum(["profile", "search"], {
+    required_error: "Please choose where to go next",
+  }),
 });
 
 export type OnboardingValues = z.infer<typeof onboardingSchema>;
 
 const STEPS = [
-  { id: 1, name: "Personal details" },
-  { id: 2, name: "Property information" },
+  { id: 1, name: "About Property Pledge" },
+  { id: 2, name: "Your details" },
 ];
 
 export default function OnboardingForm() {
@@ -51,10 +49,7 @@ export default function OnboardingForm() {
       email: "",
       phone: "",
       role: undefined,
-      location: "",
-      address: "",
-      propertyType: "",
-      duration: "",
+      destination: "search",
     },
     mode: "onChange",
   });
@@ -67,16 +62,20 @@ export default function OnboardingForm() {
       if (!form.getValues("email") && session.user.email) {
         form.setValue("email", session.user.email);
       }
+      if (!form.getValues("role") && session.user.role) {
+        form.setValue("role", session.user.role as "tenant" | "leaseholder" | "landlord");
+      }
+      if (!form.getValues("phone") && session.user.phoneNumber) {
+        form.setValue("phone", session.user.phoneNumber);
+      }
     }
   }, [session, form]);
 
   const handleNext = async () => {
-    const fieldsToValidate =
+    const isValid =
       currentStep === 1
-        ? (["name", "email", "phone", "role"] as const)
-        : (["location", "address", "propertyType", "duration"] as const);
-
-    const isValid = await form.trigger(fieldsToValidate);
+        ? true
+        : await form.trigger(["name", "email", "phone", "role", "destination"]);
 
     if (isValid) {
       setCurrentStep((prev) => Math.min(prev + 1, STEPS.length));
@@ -90,13 +89,13 @@ export default function OnboardingForm() {
   const onSubmit = async (data: OnboardingValues) => {
     setIsSubmitting(true);
     try {
-      // TODO: Submit onboarding data to API
-      console.log("Form submitted:", data);
-      
-      // Mark user as onboarded
-      await markUserAsOnboarded();
-      toast.success("Profile completed successfully!");
-      router.push("/dashboard");
+      await markUserAsOnboarded({
+        name: data.name,
+        role: data.role,
+        phoneNumber: data.phone?.trim() ? data.phone.trim() : undefined,
+      });
+      toast.success("Welcome to Property Pledge");
+      router.push(data.destination === "profile" ? "/account" : "/dashboard");
     } catch (error) {
       toast.error("Failed to complete profile");
       console.error(error);
@@ -110,10 +109,10 @@ export default function OnboardingForm() {
       <CardContent className="p-0">
         <div className="mb-8 text-center">
           <h1 className="text-2xl font-semibold text-gray-900">
-            Complete Your Profile
+            Let&apos;s get you started
           </h1>
           <p className="mt-2 text-sm text-gray-500">
-            Just a few more details to get you started
+            A quick intro and a few details to personalize your experience
           </p>
         </div>
 
@@ -167,17 +166,57 @@ export default function OnboardingForm() {
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {currentStep === 1 && <StepPersonalDetails />}
-            {currentStep === 2 && <StepPropertyInfo />}
+            {currentStep === 1 && (
+              <div className="space-y-6 rounded-2xl border border-slate-200 bg-white/80 p-6">
+                <div>
+                  <h2 className="text-xl font-semibold text-slate-900">Trustpilot for property and rentals</h2>
+                  <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                    Property Pledge helps tenants, leaseholders, and landlords share verified property
+                    experiences so everyone can make smarter rental decisions.
+                  </p>
+                </div>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                    <ShieldCheck className="h-5 w-5 text-slate-700" />
+                    <p className="mt-2 text-sm font-medium text-slate-900">Verified voices</p>
+                    <p className="text-xs text-slate-600">
+                      Real renters and owners sharing credible property feedback.
+                    </p>
+                  </div>
+                  <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                    <Search className="h-5 w-5 text-slate-700" />
+                    <p className="mt-2 text-sm font-medium text-slate-900">Find a property fast</p>
+                    <p className="text-xs text-slate-600">
+                      Search if a property is already reviewed before you commit.
+                    </p>
+                  </div>
+                  <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                    <Star className="h-5 w-5 text-slate-700" />
+                    <p className="mt-2 text-sm font-medium text-slate-900">Leave better reviews</p>
+                    <p className="text-xs text-slate-600">
+                      Help others with transparent insight on rental experiences.
+                    </p>
+                  </div>
+                  <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                    <Building2 className="h-5 w-5 text-slate-700" />
+                    <p className="mt-2 text-sm font-medium text-slate-900">Built for every role</p>
+                    <p className="text-xs text-slate-600">
+                      Whether you rent or manage, your perspective matters here.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+            {currentStep === 2 && <StepPersonalDetails />}
 
             <div className="mt-8">
               {currentStep === 1 ? (
                 <button
                   type="button"
                   onClick={handleNext}
-                  className="w-full rounded-md bg-gray-200 py-3 text-sm font-medium text-gray-600 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
+                  className="w-full rounded-md bg-slate-900 py-3 text-sm font-medium text-white hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2"
                 >
-                  Continue
+                  Continue to profile setup
                 </button>
               ) : (
                 <div className="flex space-x-4">
@@ -193,7 +232,7 @@ export default function OnboardingForm() {
                     disabled={isSubmitting}
                     className="w-full rounded-md bg-slate-900 py-3 text-sm font-medium text-white hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {isSubmitting ? "Completing..." : "Complete profile"}
+                    {isSubmitting ? "Saving..." : "Save and continue"}
                   </button>
                 </div>
               )}

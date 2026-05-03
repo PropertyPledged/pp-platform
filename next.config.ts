@@ -15,7 +15,15 @@ const config: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "img.clerk.com",
+        hostname: "avatars.githubusercontent.com",
+      },
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
+      },
+      {
+        protocol: "https",
+        hostname: "*.googleusercontent.com",
       },
     ],
   },

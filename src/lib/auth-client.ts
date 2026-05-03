@@ -13,6 +13,14 @@ export const authClient = createAuthClient({
           type: "boolean",
           required: false,
         },
+        role: {
+          type: "string",
+          required: false,
+        },
+        phoneNumber: {
+          type: "string",
+          required: false,
+        },
       },
     }),
   ],

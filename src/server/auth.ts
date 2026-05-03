@@ -49,6 +49,16 @@ export const auth = betterAuth({
         type: "boolean",
         input: false,
       },
+      role: {
+        type: "string",
+        required: false,
+        input: false,
+      },
+      phoneNumber: {
+        type: "string",
+        required: false,
+        input: false,
+      },
     },
     changeEmail: {
       enabled: true,

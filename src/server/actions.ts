@@ -22,7 +22,13 @@ export async function disableDraftMode() {
     await Promise.allSettled([disable, delay])
 }
 
-export async function markUserAsOnboarded() {
+type OnboardingPayload = {
+    name: string
+    role: 'tenant' | 'leaseholder' | 'landlord'
+    phoneNumber?: string
+}
+
+export async function markUserAsOnboarded(payload: OnboardingPayload) {
     const session = await auth.api.getSession({
         headers: await import('next/headers').then(m => m.headers()),
     })
@@ -32,6 +38,11 @@ export async function markUserAsOnboarded() {
     }
     
     await db.update(users)
-        .set({ onboarded: true })
+        .set({
+            onboarded: true,
+            name: payload.name,
+            role: payload.role,
+            phoneNumber: payload.phoneNumber?.trim() || null,
+        })
         .where(eq(users.id, session.user.id))
 }
