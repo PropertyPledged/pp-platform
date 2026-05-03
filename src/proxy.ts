@@ -24,10 +24,12 @@ function isPublicRoute(pathname: string): boolean {
   });
 }
 
+const STATIC_FILE_REGEX = /\.(?:png|jpg|jpeg|gif|svg|ico|webp|avif|mp4|mp3|pdf|woff2?|ttf|eot)$/i;
+
 export async function proxy(request: NextRequest) {
   const pathname = new URL(request.url).pathname;
 
-  if (isPublicRoute(pathname) || pathname.startsWith("/api")) {
+  if (isPublicRoute(pathname) || pathname.startsWith("/api") || STATIC_FILE_REGEX.test(pathname)) {
     return null;
   }
 
