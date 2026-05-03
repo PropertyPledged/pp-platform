@@ -24,6 +24,14 @@ if (env.APPLE_CLIENT_ID && env.APPLE_CLIENT_SECRET) {
   };
 }
 
+if (env.GITHUB_CLIENT_ID && env.GITHUB_CLIENT_SECRET) {
+  socialProviders.github = {
+    clientId: env.GITHUB_CLIENT_ID,
+    clientSecret: env.GITHUB_CLIENT_SECRET,
+    redirectURL: `${env.BETTER_AUTH_URL}/api/auth/callback/github`,
+  };
+}
+
 export const auth = betterAuth({
   baseURL: env.BETTER_AUTH_URL,
   basePath: "/api/auth",
